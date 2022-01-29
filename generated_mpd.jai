@@ -19,7 +19,7 @@ MPD_SAMPLE_FORMAT :: enum u32 {
 /**
 * This structure describes the format of a raw PCM stream.
 */
-mpd_audio_format :: struct {
+audio_format :: struct {
     /**
     * The sample rate in Hz.  A better name for this attribute is
     * "frame rate", because technically, you have two samples per
@@ -95,7 +95,7 @@ mpd_audio_format :: struct {
 * To integrate this object in a non-blocking event I/O loop, use
 * mpd_connection_get_fd() to obtain the underlying socket descriptor.
 */
-mpd_connection :: struct {}
+connection :: struct {}
 
 /**
 * Sends the "albumart" command to MPD.  Call mpd_recv_albumart() to
@@ -106,7 +106,7 @@ mpd_connection :: struct {}
 * @param offset to read from
 * @return true on success
 */
-mpd_send_albumart :: (connection: *mpd_connection, uri: *u8, offset: u32) -> bool #foreign libmpdclient;
+send_albumart :: (_connection: *connection, uri: *u8, offset: u32) -> bool #foreign libmpdclient "mpd_send_albumart";
 
 /**
 * Receives the "albumart" response
@@ -117,7 +117,7 @@ mpd_send_albumart :: (connection: *mpd_connection, uri: *u8, offset: u32) -> boo
 * @param buffer_size the size of the allocated buffer
 * @return read size on success, -1 on failure
 */
-mpd_recv_albumart :: (connection: *mpd_connection, buffer: *void, buffer_size: size_t) -> s32 #foreign libmpdclient;
+recv_albumart :: (_connection: *connection, buffer: *void, buffer_size: size_t) -> s32 #foreign libmpdclient "mpd_recv_albumart";
 
 /**
 * Shortcut for mpd_send_albumart(), mpd_recv_albumart() and
@@ -131,7 +131,7 @@ mpd_recv_albumart :: (connection: *mpd_connection, buffer: *void, buffer_size: s
 * @param buffer_size the size of the allocated buffer
 * @return read size on success, -1 on failure
 */
-mpd_run_albumart :: (connection: *mpd_connection, uri: *u8, offset: u32, buffer: *void, buffer_size: size_t) -> s32 #foreign libmpdclient;
+run_albumart :: (_connection: *connection, uri: *u8, offset: u32, buffer: *void, buffer_size: size_t) -> s32 #foreign libmpdclient "mpd_run_albumart";
 
 /**
 * Sends the "binarylimit" command to MPD.
@@ -142,7 +142,7 @@ mpd_run_albumart :: (connection: *mpd_connection, uri: *u8, offset: u32, buffer:
 *
 * @since libmpdclient 2.20, MPD 0.22.4
 */
-mpd_send_binarylimit :: (connection: *mpd_connection, limit: u32) -> bool #foreign libmpdclient;
+send_binarylimit :: (_connection: *connection, limit: u32) -> bool #foreign libmpdclient "mpd_send_binarylimit";
 
 /**
 * Shortcut for mpd_send_binarylimit() and mpd_response_finish().
@@ -153,7 +153,7 @@ mpd_send_binarylimit :: (connection: *mpd_connection, limit: u32) -> bool #forei
 *
 * @since libmpdclient 2.20, MPD 0.22.4
 */
-mpd_run_binarylimit :: (connection: *mpd_connection, limit: u32) -> bool #foreign libmpdclient;
+run_binarylimit :: (_connection: *connection, limit: u32) -> bool #foreign libmpdclient "mpd_run_binarylimit";
 
 /**
 * Reads the binary data response from the server.
@@ -165,7 +165,7 @@ mpd_run_binarylimit :: (connection: *mpd_connection, limit: u32) -> bool #foreig
 *
 * @since libmpdclient 2.17
 */
-mpd_recv_binary :: (connection: *mpd_connection, data: *void, length: size_t) -> bool #foreign libmpdclient;
+recv_binary :: (_connection: *connection, data: *void, length: size_t) -> bool #foreign libmpdclient "mpd_recv_binary";
 
 /**
 * Reads the next #mpd_pair from the server.  Returns NULL if there
@@ -174,27 +174,27 @@ mpd_recv_binary :: (connection: *mpd_connection, data: *void, length: size_t) ->
 * The caller must dispose the pair with either mpd_return_pair() or
 * mpd_enqueue_pair().
 */
-mpd_recv_pair :: (connection: *mpd_connection) -> *mpd_pair #foreign libmpdclient;
+recv_pair :: (_connection: *connection) -> *pair #foreign libmpdclient "mpd_recv_pair";
 
 /**
 * Same as mpd_recv_pair(), but discards all pairs not matching the
 * specified name.
 */
-mpd_recv_pair_named :: (connection: *mpd_connection, name: *u8) -> *mpd_pair #foreign libmpdclient;
+recv_pair_named :: (_connection: *connection, name: *u8) -> *pair #foreign libmpdclient "mpd_recv_pair_named";
 
 /**
 * Indicates that the pair object is not needed anymore, and can be
 * freed.  You must free the previous #mpd_pair object before calling
 * mpd_recv_pair() again.
 */
-mpd_return_pair :: (connection: *mpd_connection, pair: *mpd_pair) -> void #foreign libmpdclient;
+return_pair :: (_connection: *connection, _pair: *pair) -> void #foreign libmpdclient "mpd_return_pair";
 
 /**
 * Unreads a #mpd_pair.  You may unread only the one pair you just got
 * from mpd_recv_pair().  Unreading the "NULL" pair is allowed, to
 * allow you to call mpd_recv_pair() again at the end of a response.
 */
-mpd_enqueue_pair :: (connection: *mpd_connection, pair: *mpd_pair) -> void #foreign libmpdclient;
+enqueue_pair :: (_connection: *connection, _pair: *pair) -> void #foreign libmpdclient "mpd_enqueue_pair";
 
 /**
 * @since libmpdclient 2.10 added support for #MPD_TAG_MUSICBRAINZ_RELEASETRACKID.
@@ -205,7 +205,7 @@ mpd_enqueue_pair :: (connection: *mpd_connection, pair: *mpd_pair) -> void #fore
 *                                            #MPD_TAG_WORK,
 *                                            #MPD_TAG_CONDUCTOR.
 */
-mpd_tag_type :: enum s32 {
+tag_type :: enum s32 {
     UNKNOWN                    :: -1;
     ARTIST                     :: 0;
     ALBUM                      :: 1;
@@ -246,7 +246,7 @@ mpd_tag_type :: enum s32 {
 *
 * @return the name, or NULL if the tag type is not valid
 */
-mpd_tag_name :: (type: mpd_tag_type) -> *u8 #foreign libmpdclient;
+tag_name :: (type: tag_type) -> *u8 #foreign libmpdclient "mpd_tag_name";
 
 /**
 * Parses a tag name, and returns its #mpd_tag_type value.
@@ -254,7 +254,7 @@ mpd_tag_name :: (type: mpd_tag_type) -> *u8 #foreign libmpdclient;
 * @return a #mpd_tag_type value, or MPD_TAG_UNKNOWN if the name was
 * not recognized
 */
-mpd_tag_name_parse :: (name: *u8) -> mpd_tag_type #foreign libmpdclient;
+tag_name_parse :: (name: *u8) -> tag_type #foreign libmpdclient "mpd_tag_name_parse";
 
 /**
 * Same as mpd_tag_name_parse(), but ignores case.
@@ -262,7 +262,7 @@ mpd_tag_name_parse :: (name: *u8) -> mpd_tag_type #foreign libmpdclient;
 * @return a #mpd_tag_type value, or MPD_TAG_UNKNOWN if the name was
 * not recognized
 */
-mpd_tag_name_iparse :: (name: *u8) -> mpd_tag_type #foreign libmpdclient;
+tag_name_iparse :: (name: *u8) -> tag_type #foreign libmpdclient "mpd_tag_name_iparse";
 
 /**
 * Requests a list of supported and allowed commands. Use
@@ -271,7 +271,7 @@ mpd_tag_name_iparse :: (name: *u8) -> mpd_tag_type #foreign libmpdclient;
 * @param connection the connection to MPD
 * @return true on success, false on error
 */
-mpd_send_allowed_commands :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_allowed_commands :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_allowed_commands";
 
 /**
 * Requests a list of supported commands which are not allowed for
@@ -281,7 +281,7 @@ mpd_send_allowed_commands :: (connection: *mpd_connection) -> bool #foreign libm
 * @param connection the connection to MPD
 * @return true on success, false on error
 */
-mpd_send_disallowed_commands :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_disallowed_commands :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_disallowed_commands";
 
 /**
 * Requests a list of supported URL handlers in the form "scheme://",
@@ -291,7 +291,7 @@ mpd_send_disallowed_commands :: (connection: *mpd_connection) -> bool #foreign l
 * @param connection the connection to MPD
 * @return true on success, false on error
 */
-mpd_send_list_url_schemes :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_list_url_schemes :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_list_url_schemes";
 
 /**
 * Requests a list of supported tag types.  Use mpd_recv_tag_type_pair()
@@ -300,7 +300,7 @@ mpd_send_list_url_schemes :: (connection: *mpd_connection) -> bool #foreign libm
 * @param connection the connection to MPD
 * @return true on success, false on error
 */
-mpd_send_list_tag_types :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_list_tag_types :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_list_tag_types";
 
 /**
 * Remove one or more tags from the list of tag types the client is
@@ -314,14 +314,14 @@ mpd_send_list_tag_types :: (connection: *mpd_connection) -> bool #foreign libmpd
 *
 * @since libmpdclient 2.12, MPD 0.21
 */
-mpd_send_disable_tag_types :: (connection: *mpd_connection, types: *mpd_tag_type, n: u32) -> bool #foreign libmpdclient;
+send_disable_tag_types :: (_connection: *connection, types: *tag_type, n: u32) -> bool #foreign libmpdclient "mpd_send_disable_tag_types";
 
 /**
 * Shortcut for mpd_send_disable_tag_types() and mpd_response_finish().
 *
 * @since libmpdclient 2.12, MPD 0.21
 */
-mpd_run_disable_tag_types :: (connection: *mpd_connection, types: *mpd_tag_type, n: u32) -> bool #foreign libmpdclient;
+run_disable_tag_types :: (_connection: *connection, types: *tag_type, n: u32) -> bool #foreign libmpdclient "mpd_run_disable_tag_types";
 
 /**
 * Re-enable one or more tags from the list of tag types for this
@@ -335,14 +335,14 @@ mpd_run_disable_tag_types :: (connection: *mpd_connection, types: *mpd_tag_type,
 *
 * @since libmpdclient 2.12, MPD 0.21
 */
-mpd_send_enable_tag_types :: (connection: *mpd_connection, types: *mpd_tag_type, n: u32) -> bool #foreign libmpdclient;
+send_enable_tag_types :: (_connection: *connection, types: *tag_type, n: u32) -> bool #foreign libmpdclient "mpd_send_enable_tag_types";
 
 /**
 * Shortcut for mpd_send_enable_tag_types() and mpd_response_finish().
 *
 * @since libmpdclient 2.12, MPD 0.21
 */
-mpd_run_enable_tag_types :: (connection: *mpd_connection, types: *mpd_tag_type, n: u32) -> bool #foreign libmpdclient;
+run_enable_tag_types :: (_connection: *connection, types: *tag_type, n: u32) -> bool #foreign libmpdclient "mpd_run_enable_tag_types";
 
 /**
 * Clear the list of tag types this client is interested in.  This
@@ -353,14 +353,14 @@ mpd_run_enable_tag_types :: (connection: *mpd_connection, types: *mpd_tag_type, 
 *
 * @since libmpdclient 2.12, MPD 0.21
 */
-mpd_send_clear_tag_types :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_clear_tag_types :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_clear_tag_types";
 
 /**
 * Shortcut for mpd_send_clear_tag_types() and mpd_response_finish().
 *
 * @since libmpdclient 2.12, MPD 0.21
 */
-mpd_run_clear_tag_types :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+run_clear_tag_types :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_run_clear_tag_types";
 
 /**
 * Add all tags to the list of tag types this client is interested in.
@@ -371,16 +371,16 @@ mpd_run_clear_tag_types :: (connection: *mpd_connection) -> bool #foreign libmpd
 *
 * @since libmpdclient 2.19, MPD 0.21
 */
-mpd_send_all_tag_types :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_all_tag_types :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_all_tag_types";
 
 /**
 * Shortcut for mpd_send_all_tag_types() and mpd_response_finish().
 *
 * @since libmpdclient 2.19, MPD 0.21
 */
-mpd_run_all_tag_types :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+run_all_tag_types :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_run_all_tag_types";
 
-mpd_server_error :: enum s32 {
+server_error :: enum s32 {
     UNK            :: -1;
     NOT_LIST       :: 1;
     ARG            :: 2;
@@ -396,7 +396,7 @@ mpd_server_error :: enum s32 {
     EXIST          :: 56;
 }
 
-mpd_error :: enum u32 {
+error :: enum u32 {
     SUCCESS   :: 0;
     OOM       :: 1;
     ARGUMENT  :: 2;
@@ -409,7 +409,7 @@ mpd_error :: enum u32 {
     SERVER    :: 9;
 }
 
-mpd_async :: struct {}
+async :: struct {}
 
 /**
 * Opens a new connection to a MPD server.  Both the name server
@@ -435,7 +435,7 @@ mpd_async :: struct {}
 * @since libmpdclient 2.3 added support for `MPD_HOST`, `MPD_PORT`
 * and `MPD_TIMEOUT`.
 */
-mpd_connection_new :: (host: *u8, port: u32, timeout_ms: u32) -> *mpd_connection #foreign libmpdclient;
+connection_new :: (host: *u8, port: u32, timeout_ms: u32) -> *connection #foreign libmpdclient "mpd_connection_new";
 
 /**
 * Creates a #mpd_connection object based on an existing asynchronous
@@ -450,28 +450,28 @@ mpd_connection_new :: (host: *u8, port: u32, timeout_ms: u32) -> *mpd_connection
 * @param welcome the first line sent by MPD (the welcome message)
 * @return a mpd_connection object, or `NULL` on out-of-memory
 */
-mpd_connection_new_async :: (async: *mpd_async, welcome: *u8) -> *mpd_connection #foreign libmpdclient;
+connection_new_async :: (_async: *async, welcome: *u8) -> *connection #foreign libmpdclient "mpd_connection_new_async";
 
 /**
 * Close the connection and free all memory.
 *
 * @param connection the connection to MPD
 */
-mpd_connection_free :: (connection: *mpd_connection) -> void #foreign libmpdclient;
+connection_free :: (_connection: *connection) -> void #foreign libmpdclient "mpd_connection_free";
 
 /**
 * \struct mpd_settings
 *
 * An object which describes configurable connection settings.
 */
-mpd_settings :: struct {}
+settings :: struct {}
 /**
 * Returns the settings which were used to connect to the server.  May
 * be `NULL` if the settings are not known.
 *
 * @since libmpdclient 2.4
 */
-mpd_connection_get_settings :: (connection: *mpd_connection) -> *mpd_settings #foreign libmpdclient;
+connection_get_settings :: (_connection: *connection) -> *settings #foreign libmpdclient "mpd_connection_get_settings";
 
 /**
 * Enables (or disables) TCP keepalives.
@@ -488,7 +488,7 @@ mpd_connection_get_settings :: (connection: *mpd_connection) -> *mpd_settings #f
 *
 * @since libmpdclient 2.10
 */
-mpd_connection_set_keepalive :: (connection: *mpd_connection, keepalive: bool) -> bool #foreign libmpdclient;
+connection_set_keepalive :: (_connection: *connection, keepalive: bool) -> bool #foreign libmpdclient "mpd_connection_set_keepalive";
 
 /**
 * Sets the timeout for synchronous operations.  If the MPD server
@@ -502,7 +502,7 @@ mpd_connection_set_keepalive :: (connection: *mpd_connection, keepalive: bool) -
 * @param connection the connection to MPD
 * @param timeout_ms the desired timeout in milliseconds; must not be 0
 */
-mpd_connection_set_timeout :: (connection: *mpd_connection, timeout_ms: u32) -> void #foreign libmpdclient;
+connection_set_timeout :: (_connection: *connection, timeout_ms: u32) -> void #foreign libmpdclient "mpd_connection_set_timeout";
 
 /**
 * Returns the file descriptor which should be polled by the caller.
@@ -526,7 +526,7 @@ mpd_connection_set_timeout :: (connection: *mpd_connection, timeout_ms: u32) -> 
 *     // handle the events
 *     // .. and then call mpd_send_idle() again to keep listening
 */
-mpd_connection_get_fd :: (connection: *mpd_connection) -> s32 #foreign libmpdclient;
+connection_get_fd :: (_connection: *connection) -> s32 #foreign libmpdclient "mpd_connection_get_fd";
 
 /**
 * Returns the underlying #mpd_async object.  This can be used to send
@@ -537,13 +537,13 @@ mpd_connection_get_fd :: (connection: *mpd_connection) -> s32 #foreign libmpdcli
 * If an error occurs while using #mpd_async, you must close the
 * #mpd_connection.
 */
-mpd_connection_get_async :: (connection: *mpd_connection) -> *mpd_async #foreign libmpdclient;
+connection_get_async :: (_connection: *connection) -> *async #foreign libmpdclient "mpd_connection_get_async";
 
 /**
 * Returns the libmpdclient error code.  MPD_ERROR_SUCCESS means no
 * error occurred.
 */
-mpd_connection_get_error :: (connection: *mpd_connection) -> mpd_error #foreign libmpdclient;
+connection_get_error :: (_connection: *connection) -> error #foreign libmpdclient "mpd_connection_get_error";
 
 /**
 * Returns the human-readable (English) libmpdclient error message.
@@ -555,14 +555,14 @@ mpd_connection_get_error :: (connection: *mpd_connection) -> mpd_error #foreign 
 * system, and thus the locale's character set (and probably language)
 * is used.  Keep that in mind when you print error messages.
 */
-mpd_connection_get_error_message :: (connection: *mpd_connection) -> *u8 #foreign libmpdclient;
+connection_get_error_message :: (_connection: *connection) -> *u8 #foreign libmpdclient "mpd_connection_get_error_message";
 
 /**
 * Returns the error code returned from the server.  Calling this
 * function is only valid if mpd_connection_get_error() returned
 * #MPD_ERROR_SERVER.
 */
-mpd_connection_get_server_error :: (connection: *mpd_connection) -> mpd_server_error #foreign libmpdclient;
+connection_get_server_error :: (_connection: *connection) -> server_error #foreign libmpdclient "mpd_connection_get_server_error";
 
 /**
 * Returns the location of the server error, i.e. an index within the
@@ -572,7 +572,7 @@ mpd_connection_get_server_error :: (connection: *mpd_connection) -> mpd_server_e
 *
 * @since libmpdclient 2.4
 */
-mpd_connection_get_server_error_location :: (connection: *mpd_connection) -> u32 #foreign libmpdclient;
+connection_get_server_error_location :: (_connection: *connection) -> u32 #foreign libmpdclient "mpd_connection_get_server_error_location";
 
 /**
 * Returns the error code from the operating system; on most operating
@@ -581,7 +581,7 @@ mpd_connection_get_server_error_location :: (connection: *mpd_connection) -> u32
 *
 * May be 0 if the operating system did not specify an error code.
 */
-mpd_connection_get_system_error :: (connection: *mpd_connection) -> s32 #foreign libmpdclient;
+connection_get_system_error :: (_connection: *connection) -> s32 #foreign libmpdclient "mpd_connection_get_system_error";
 
 /**
 * Attempts to recover from an error condition.  This function must be
@@ -591,13 +591,13 @@ mpd_connection_get_system_error :: (connection: *mpd_connection) -> s32 #foreign
 * @return true on success, false if the error is fatal and cannot be
 * recovered
 */
-mpd_connection_clear_error :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+connection_clear_error :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_connection_clear_error";
 
 /**
 * Returns a three-tuple containing the major, minor and patch version
 * of the MPD protocol.
 */
-mpd_connection_get_server_version :: (connection: *mpd_connection) -> *u32 #foreign libmpdclient;
+connection_get_server_version :: (_connection: *connection) -> *u32 #foreign libmpdclient "mpd_connection_get_server_version";
 
 /**
 * Compares the MPD protocol version with the specified triple.
@@ -605,7 +605,7 @@ mpd_connection_get_server_version :: (connection: *mpd_connection) -> *u32 #fore
 * @return -1 if the server is older, 1 if it is newer, 0 if it is
 * equal
 */
-mpd_connection_cmp_server_version :: (connection: *mpd_connection, major: u32, minor: u32, patch: u32) -> s32 #foreign libmpdclient;
+connection_cmp_server_version :: (_connection: *connection, major: u32, minor: u32, patch: u32) -> s32 #foreign libmpdclient "mpd_connection_cmp_server_version";
 
 /**
 * Get a recursive list of all directories, songs and playlist from
@@ -618,7 +618,7 @@ mpd_connection_cmp_server_version :: (connection: *mpd_connection, major: u32, m
 * @param path an optional base path for the query
 * @return true on success, false on error
 */
-mpd_send_list_all :: (connection: *mpd_connection, path: *u8) -> bool #foreign libmpdclient;
+send_list_all :: (_connection: *connection, path: *u8) -> bool #foreign libmpdclient "mpd_send_list_all";
 
 /**
 * Like #mpd_send_list_all(), but return metadata.  This operation is
@@ -632,7 +632,7 @@ mpd_send_list_all :: (connection: *mpd_connection, path: *u8) -> bool #foreign l
 * @param path an optional base path for the query
 * @return true on success, false on error
 */
-mpd_send_list_all_meta :: (connection: *mpd_connection, path: *u8) -> bool #foreign libmpdclient;
+send_list_all_meta :: (_connection: *connection, path: *u8) -> bool #foreign libmpdclient "mpd_send_list_all_meta";
 
 /**
 * Get a list of all directories, songs and playlist in a directory
@@ -644,7 +644,7 @@ mpd_send_list_all_meta :: (connection: *mpd_connection, path: *u8) -> bool #fore
 * @param path an optional directory to be listed
 * @return true on success, false on error
 */
-mpd_send_list_meta :: (connection: *mpd_connection, path: *u8) -> bool #foreign libmpdclient;
+send_list_meta :: (_connection: *connection, path: *u8) -> bool #foreign libmpdclient "mpd_send_list_meta";
 
 /**
 * Lists the contents of the specified directory, including files that are
@@ -660,7 +660,7 @@ mpd_send_list_meta :: (connection: *mpd_connection, path: *u8) -> bool #foreign 
 *
 * @since libmpdclient 2.12, MPD 0.19
 */
-mpd_send_list_files :: (connection: *mpd_connection, uri: *u8) -> bool #foreign libmpdclient;
+send_list_files :: (_connection: *connection, uri: *u8) -> bool #foreign libmpdclient "mpd_send_list_files";
 
 /**
 * Send "readcomments".  Read the "comments" of a song file.  This
@@ -673,7 +673,7 @@ mpd_send_list_files :: (connection: *mpd_connection, uri: *u8) -> bool #foreign 
 *
 * @since libmpdclient 2.9
 */
-mpd_send_read_comments :: (connection: *mpd_connection, path: *u8) -> bool #foreign libmpdclient;
+send_read_comments :: (_connection: *connection, path: *u8) -> bool #foreign libmpdclient "mpd_send_read_comments";
 
 /**
 * Instructs MPD to update the music database: find new files, remove
@@ -684,7 +684,7 @@ mpd_send_read_comments :: (connection: *mpd_connection, path: *u8) -> bool #fore
 * directory is updated
 * @return true on success, false on error
 */
-mpd_send_update :: (connection: *mpd_connection, path: *u8) -> bool #foreign libmpdclient;
+send_update :: (_connection: *connection, path: *u8) -> bool #foreign libmpdclient "mpd_send_update";
 
 /**
 * Like mpd_send_update(), but also rescans unmodified files.
@@ -694,7 +694,7 @@ mpd_send_update :: (connection: *mpd_connection, path: *u8) -> bool #foreign lib
 * directory is updated
 * @return true on success, false on error
 */
-mpd_send_rescan :: (connection: *mpd_connection, path: *u8) -> bool #foreign libmpdclient;
+send_rescan :: (_connection: *connection, path: *u8) -> bool #foreign libmpdclient "mpd_send_rescan";
 
 /**
 * Receives the id of the update job which was submitted by
@@ -703,7 +703,7 @@ mpd_send_rescan :: (connection: *mpd_connection, path: *u8) -> bool #foreign lib
 * @param connection the connection to MPD
 * @return a positive job id on success, 0 on error
 */
-mpd_recv_update_id :: (connection: *mpd_connection) -> u32 #foreign libmpdclient;
+recv_update_id :: (_connection: *connection) -> u32 #foreign libmpdclient "mpd_recv_update_id";
 
 /**
 * Shortcut for mpd_send_update() and mpd_recv_update_id().
@@ -713,7 +713,7 @@ mpd_recv_update_id :: (connection: *mpd_connection) -> u32 #foreign libmpdclient
 * directory is updated
 * @return a positive job id on success, 0 on error
 */
-mpd_run_update :: (connection: *mpd_connection, path: *u8) -> u32 #foreign libmpdclient;
+run_update :: (_connection: *connection, path: *u8) -> u32 #foreign libmpdclient "mpd_run_update";
 
 /**
 * Like mpd_run_update(), but also rescans unmodified files.
@@ -723,7 +723,7 @@ mpd_run_update :: (connection: *mpd_connection, path: *u8) -> u32 #foreign libmp
 * directory is updated
 * @return a positive job id on success, 0 on error
 */
-mpd_run_rescan :: (connection: *mpd_connection, path: *u8) -> u32 #foreign libmpdclient;
+run_rescan :: (_connection: *connection, path: *u8) -> u32 #foreign libmpdclient "mpd_run_rescan";
 
 /**
 * \struct mpd_directory
@@ -731,25 +731,25 @@ mpd_run_rescan :: (connection: *mpd_connection, path: *u8) -> u32 #foreign libmp
 * An opaque directory object.  This is a container for more songs,
 * directories or playlists.
 */
-mpd_directory :: struct {}
+directory :: struct {}
 
 /**
 * Duplicates a #mpd_directory object.
 *
 * @return the new object, or NULL on out of memory
 */
-mpd_directory_dup :: (directory: *mpd_directory) -> *mpd_directory #foreign libmpdclient;
+directory_dup :: (_directory: *directory) -> *directory #foreign libmpdclient "mpd_directory_dup";
 
 /**
 * Free memory allocated by the #mpd_directory object.
 */
-mpd_directory_free :: (directory: *mpd_directory) -> void #foreign libmpdclient;
+directory_free :: (_directory: *directory) -> void #foreign libmpdclient "mpd_directory_free";
 
 /**
 * Returns the path of this directory, relative to the MPD music
 * directory.  It does not begin with a slash.
 */
-mpd_directory_get_path :: (directory: *mpd_directory) -> *u8 #foreign libmpdclient;
+directory_get_path :: (_directory: *directory) -> *u8 #foreign libmpdclient "mpd_directory_get_path";
 
 /**
 * @return the POSIX UTC time stamp of the last modification, or 0 if
@@ -757,7 +757,7 @@ mpd_directory_get_path :: (directory: *mpd_directory) -> *u8 #foreign libmpdclie
 *
 * @since libmpdclient 2.9
 */
-mpd_directory_get_last_modified :: (directory: *mpd_directory) -> time_t #foreign libmpdclient;
+directory_get_last_modified :: (_directory: *directory) -> time_t #foreign libmpdclient "mpd_directory_get_last_modified";
 
 /**
 * Begins parsing a new directory.
@@ -766,7 +766,7 @@ mpd_directory_get_last_modified :: (directory: *mpd_directory) -> time_t #foreig
 * @return the new #mpd_entity object, or NULL on error (out of
 * memory, or pair name is not "directory")
 */
-mpd_directory_begin :: (pair: *mpd_pair) -> *mpd_directory #foreign libmpdclient;
+directory_begin :: (_pair: *pair) -> *directory #foreign libmpdclient "mpd_directory_begin";
 
 /**
 * Parses the pair, adding its information to the specified
@@ -776,7 +776,7 @@ mpd_directory_begin :: (pair: *mpd_pair) -> *mpd_directory #foreign libmpdclient
 * the pair was not understood and ignored), false if this pair is the
 * beginning of the next directory
 */
-mpd_directory_feed :: (directory: *mpd_directory, pair: *mpd_pair) -> bool #foreign libmpdclient;
+directory_feed :: (_directory: *directory, _pair: *pair) -> bool #foreign libmpdclient "mpd_directory_feed";
 
 /**
 * Receives the next directory from the MPD server.
@@ -784,7 +784,7 @@ mpd_directory_feed :: (directory: *mpd_directory, pair: *mpd_pair) -> bool #fore
 * @return a #mpd_directory object, or NULL on error or if the directory list is
 * finished
 */
-mpd_recv_directory :: (connection: *mpd_connection) -> *mpd_directory #foreign libmpdclient;
+recv_directory :: (_connection: *connection) -> *directory #foreign libmpdclient "mpd_recv_directory";
 
 /**
 * \struct mpd_song
@@ -793,26 +793,26 @@ mpd_recv_directory :: (connection: *mpd_connection) -> *mpd_directory #foreign l
 * Use the functions provided by this header to access the object's
 * attributes.
 */
-mpd_song :: struct {}
+song :: struct {}
 
 /**
 * Free memory allocated by the #mpd_song object.
 */
-mpd_song_free :: (song: *mpd_song) -> void #foreign libmpdclient;
+song_free :: (_song: *song) -> void #foreign libmpdclient "mpd_song_free";
 
 /**
 * Duplicates the specified #mpd_song object.
 *
 * @returns the copy, or NULL if out of memory
 */
-mpd_song_dup :: (song: *mpd_song) -> *mpd_song #foreign libmpdclient;
+song_dup :: (_song: *song) -> *song #foreign libmpdclient "mpd_song_dup";
 
 /**
 * Returns the URI of the song.  This is either a path relative to the
 * MPD music directory (without leading slash), or an URL with a
 * scheme, e.g. a HTTP URL for a radio stream.
 */
-mpd_song_get_uri :: (song: *mpd_song) -> *u8 #foreign libmpdclient;
+song_get_uri :: (_song: *song) -> *u8 #foreign libmpdclient "mpd_song_get_uri";
 
 /**
 * Queries a tag value.
@@ -825,13 +825,13 @@ mpd_song_get_uri :: (song: *mpd_song) -> *u8 #foreign libmpdclient;
 * @return the tag value, or NULL if this tag type (or this index)
 * does not exist
 */
-mpd_song_get_tag :: (song: *mpd_song, type: mpd_tag_type, idx: u32) -> *u8 #foreign libmpdclient;
+song_get_tag :: (_song: *song, type: tag_type, idx: u32) -> *u8 #foreign libmpdclient "mpd_song_get_tag";
 
 /**
 * Returns the duration of this song in seconds.  0 means the duration
 * is unknown.
 */
-mpd_song_get_duration :: (song: *mpd_song) -> u32 #foreign libmpdclient;
+song_get_duration :: (_song: *song) -> u32 #foreign libmpdclient "mpd_song_get_duration";
 
 /**
 * Returns the duration of this song in milliseconds.  0 means the
@@ -839,7 +839,7 @@ mpd_song_get_duration :: (song: *mpd_song) -> u32 #foreign libmpdclient;
 *
 * @since libmpdclient 2.10
 */
-mpd_song_get_duration_ms :: (song: *mpd_song) -> u32 #foreign libmpdclient;
+song_get_duration_ms :: (_song: *song) -> u32 #foreign libmpdclient "mpd_song_get_duration_ms";
 
 /**
 * Returns the start of the virtual song within the physical file in
@@ -847,7 +847,7 @@ mpd_song_get_duration_ms :: (song: *mpd_song) -> u32 #foreign libmpdclient;
 *
 * @since libmpdclient 2.3
 */
-mpd_song_get_start :: (song: *mpd_song) -> u32 #foreign libmpdclient;
+song_get_start :: (_song: *song) -> u32 #foreign libmpdclient "mpd_song_get_start";
 
 /**
 * Returns the end of the virtual song within the physical file in
@@ -855,13 +855,13 @@ mpd_song_get_start :: (song: *mpd_song) -> u32 #foreign libmpdclient;
 *
 * @since libmpdclient 2.3
 */
-mpd_song_get_end :: (song: *mpd_song) -> u32 #foreign libmpdclient;
+song_get_end :: (_song: *song) -> u32 #foreign libmpdclient "mpd_song_get_end";
 
 /**
 * @return the POSIX UTC time stamp of the last modification, or 0 if
 * that is unknown
 */
-mpd_song_get_last_modified :: (song: *mpd_song) -> time_t #foreign libmpdclient;
+song_get_last_modified :: (_song: *song) -> time_t #foreign libmpdclient "mpd_song_get_last_modified";
 
 /**
 * Sets the position within the queue.  This value is not used for
@@ -870,19 +870,19 @@ mpd_song_get_last_modified :: (song: *mpd_song) -> time_t #foreign libmpdclient;
 * This function is useful when applying the values returned by
 * mpd_recv_queue_change_brief().
 */
-mpd_song_set_pos :: (song: *mpd_song, pos: u32) -> void #foreign libmpdclient;
+song_set_pos :: (_song: *song, pos: u32) -> void #foreign libmpdclient "mpd_song_set_pos";
 
 /**
 * Returns the position of this song in the queue.  The value is
 * undefined if you did not obtain this song from the queue.
 */
-mpd_song_get_pos :: (song: *mpd_song) -> u32 #foreign libmpdclient;
+song_get_pos :: (_song: *song) -> u32 #foreign libmpdclient "mpd_song_get_pos";
 
 /**
 * Returns the id of this song in the playlist.  The value is
 * undefined if you did not obtain this song from the queue.
 */
-mpd_song_get_id :: (song: *mpd_song) -> u32 #foreign libmpdclient;
+song_get_id :: (_song: *song) -> u32 #foreign libmpdclient "mpd_song_get_id";
 
 /**
 * Returns the priority of this song in the playlist.  The value is
@@ -890,7 +890,7 @@ mpd_song_get_id :: (song: *mpd_song) -> u32 #foreign libmpdclient;
 *
 * @since libmpdclient 2.8
 */
-mpd_song_get_prio :: (song: *mpd_song) -> u32 #foreign libmpdclient;
+song_get_prio :: (_song: *song) -> u32 #foreign libmpdclient "mpd_song_get_prio";
 
 /**
 * Returns audio format as determined by MPD's decoder plugin.  May
@@ -898,7 +898,7 @@ mpd_song_get_prio :: (song: *mpd_song) -> u32 #foreign libmpdclient;
 *
 * @since libmpdclient 2.15
 */
-mpd_song_get_audio_format :: (song: *mpd_song) -> *mpd_audio_format #foreign libmpdclient;
+song_get_audio_format :: (_song: *song) -> *audio_format #foreign libmpdclient "mpd_song_get_audio_format";
 
 /**
 * Begins parsing a new song.
@@ -907,7 +907,7 @@ mpd_song_get_audio_format :: (song: *mpd_song) -> *mpd_audio_format #foreign lib
 * @return the new #mpd_entity object, or NULL on error (out of
 * memory, or pair name is not "file")
 */
-mpd_song_begin :: (pair: *mpd_pair) -> *mpd_song #foreign libmpdclient;
+song_begin :: (_pair: *pair) -> *song #foreign libmpdclient "mpd_song_begin";
 
 /**
 * Parses the pair, adding its information to the specified
@@ -917,7 +917,7 @@ mpd_song_begin :: (pair: *mpd_pair) -> *mpd_song #foreign libmpdclient;
 * the pair was not understood and ignored), false if this pair is the
 * beginning of the next song
 */
-mpd_song_feed :: (song: *mpd_song, pair: *mpd_pair) -> bool #foreign libmpdclient;
+song_feed :: (_song: *song, _pair: *pair) -> bool #foreign libmpdclient "mpd_song_feed";
 
 /**
 * Receives the next song from the MPD server.
@@ -925,12 +925,12 @@ mpd_song_feed :: (song: *mpd_song, pair: *mpd_pair) -> bool #foreign libmpdclien
 * @return a #mpd_song object, or NULL on error or if the song list is
 * finished
 */
-mpd_recv_song :: (connection: *mpd_connection) -> *mpd_song #foreign libmpdclient;
+recv_song :: (_connection: *connection) -> *song #foreign libmpdclient "mpd_recv_song";
 
 /**
 * The type of a #mpd_entity object.
 */
-mpd_entity_type :: enum u32 {
+entity_type :: enum u32 {
     UNKNOWN   :: 0;
     DIRECTORY :: 1;
     SONG      :: 2;
@@ -943,17 +943,17 @@ mpd_entity_type :: enum u32 {
 * An "entity" is an object returned by commands like "lsinfo".  It is
 * an object wrapping all possible entity types.
 */
-mpd_entity :: struct {}
+entity :: struct {}
 
 /**
 * Releases an entity.  This also frees the wrapped object.
 */
-mpd_entity_free :: (entity: *mpd_entity) -> void #foreign libmpdclient;
+entity_free :: (_entity: *entity) -> void #foreign libmpdclient "mpd_entity_free";
 
 /**
 * @return the type of this entity.
 */
-mpd_entity_get_type :: (entity: *mpd_entity) -> mpd_entity_type #foreign libmpdclient;
+entity_get_type :: (_entity: *entity) -> entity_type #foreign libmpdclient "mpd_entity_get_type";
 
 /**
 * Obtains a pointer to the #mpd_directory object enclosed by this
@@ -962,7 +962,7 @@ mpd_entity_get_type :: (entity: *mpd_entity) -> mpd_entity_type #foreign libmpdc
 *
 * @return the directory object
 */
-mpd_entity_get_directory :: (entity: *mpd_entity) -> *mpd_directory #foreign libmpdclient;
+entity_get_directory :: (_entity: *entity) -> *directory #foreign libmpdclient "mpd_entity_get_directory";
 
 /**
 * Obtains a pointer to the #mpd_song object enclosed by this
@@ -971,7 +971,7 @@ mpd_entity_get_directory :: (entity: *mpd_entity) -> *mpd_directory #foreign lib
 *
 * @return the song object
 */
-mpd_entity_get_song :: (entity: *mpd_entity) -> *mpd_song #foreign libmpdclient;
+entity_get_song :: (_entity: *entity) -> *song #foreign libmpdclient "mpd_entity_get_song";
 
 /**
 * \struct mpd_playlist
@@ -980,7 +980,7 @@ mpd_entity_get_song :: (entity: *mpd_entity) -> *mpd_song #foreign libmpdclient;
 * playlist directory.  Use the functions provided by this header to
 * access the object's attributes.
 */
-mpd_playlist :: struct {}
+playlist :: struct {}
 /**
 * Obtains a pointer to the #mpd_playlist object enclosed by
 * this #mpd_entity.  Calling this function is only allowed if
@@ -988,7 +988,7 @@ mpd_playlist :: struct {}
 *
 * @return the playlist object
 */
-mpd_entity_get_playlist :: (entity: *mpd_entity) -> *mpd_playlist #foreign libmpdclient;
+entity_get_playlist :: (_entity: *entity) -> *playlist #foreign libmpdclient "mpd_entity_get_playlist";
 
 /**
 * Begins parsing a new entity.
@@ -996,7 +996,7 @@ mpd_entity_get_playlist :: (entity: *mpd_entity) -> *mpd_playlist #foreign libmp
 * @param pair the first pair in this entity
 * @return the new #mpd_entity object, or NULL on error (out of memory)
 */
-mpd_entity_begin :: (pair: *mpd_pair) -> *mpd_entity #foreign libmpdclient;
+entity_begin :: (_pair: *pair) -> *entity #foreign libmpdclient "mpd_entity_begin";
 
 /**
 * Parses the pair, adding its information to the specified
@@ -1006,7 +1006,7 @@ mpd_entity_begin :: (pair: *mpd_pair) -> *mpd_entity #foreign libmpdclient;
 * the pair was not understood and ignored), false if this pair is the
 * beginning of the next entity
 */
-mpd_entity_feed :: (entity: *mpd_entity, pair: *mpd_pair) -> bool #foreign libmpdclient;
+entity_feed :: (_entity: *entity, _pair: *pair) -> bool #foreign libmpdclient "mpd_entity_feed";
 
 /**
 * Receives the next entity from the MPD server.
@@ -1014,9 +1014,9 @@ mpd_entity_feed :: (entity: *mpd_entity, pair: *mpd_pair) -> bool #foreign libmp
 * @return an entity object, or NULL on error or if the entity list is
 * finished
 */
-mpd_recv_entity :: (connection: *mpd_connection) -> *mpd_entity #foreign libmpdclient;
+recv_entity :: (_connection: *connection) -> *entity #foreign libmpdclient "mpd_recv_entity";
 
-mpd_fingerprint_type :: enum u32 {
+fingerprint_type :: enum u32 {
     UNKNOWN     :: 0;
     CHROMAPRINT :: 1;
 }
@@ -1024,7 +1024,7 @@ mpd_fingerprint_type :: enum u32 {
 /**
 * Parse a #mpd_pair name to check which fingerprint type it contains.
 */
-mpd_parse_fingerprint_type :: (name: *u8) -> mpd_fingerprint_type #foreign libmpdclient;
+parse_fingerprint_type :: (name: *u8) -> fingerprint_type #foreign libmpdclient "mpd_parse_fingerprint_type";
 
 /**
 * Sends the "getfingerprint" command to MPD.  Call mpd_recv_pair() to
@@ -1038,7 +1038,7 @@ mpd_parse_fingerprint_type :: (name: *u8) -> mpd_fingerprint_type #foreign libmp
 *
 * @since libmpdclient 2.17, MPD 0.22
 */
-mpd_send_getfingerprint :: (connection: *mpd_connection, uri: *u8) -> bool #foreign libmpdclient;
+send_getfingerprint :: (_connection: *connection, uri: *u8) -> bool #foreign libmpdclient "mpd_send_getfingerprint";
 
 /**
 * Shortcut for mpd_send_getfingerprint(), mpd_recv_pair_named() and
@@ -1055,7 +1055,7 @@ mpd_send_getfingerprint :: (connection: *mpd_connection, uri: *u8) -> bool #fore
 *
 * @since libmpdclient 2.17, MPD 0.22
 */
-mpd_run_getfingerprint_chromaprint :: (connection: *mpd_connection, uri: *u8, buffer: *u8, buffer_size: size_t) -> *u8 #foreign libmpdclient;
+run_getfingerprint_chromaprint :: (_connection: *connection, uri: *u8, buffer: *u8, buffer_size: size_t) -> *u8 #foreign libmpdclient "mpd_run_getfingerprint_chromaprint";
 
 /**
 * This enum contains bit masks for all idle events.
@@ -1066,7 +1066,7 @@ mpd_run_getfingerprint_chromaprint :: (connection: *mpd_connection, uri: *u8, bu
 * @since libmpdclient 2.19 added support for #MPD_IDLE_NEIGHBOR,
 * #MPD_IDLE_MOUNT
 */
-mpd_idle :: enum u32 {
+idle :: enum u32 {
     DATABASE        :: 1;
     STORED_PLAYLIST :: 2;
     QUEUE           :: 4;
@@ -1090,7 +1090,7 @@ mpd_idle :: enum u32 {
 * @param idle an idle event id
 * @return the name, or NULL if that event is not known
 */
-mpd_idle_name :: (idle: mpd_idle) -> *u8 #foreign libmpdclient;
+idle_name :: (_idle: idle) -> *u8 #foreign libmpdclient "mpd_idle_name";
 
 /**
 * Parses the name of an idle event.
@@ -1098,7 +1098,7 @@ mpd_idle_name :: (idle: mpd_idle) -> *u8 #foreign libmpdclient;
 * @param name an idle event name
 * @return the id, or 0 if that event is not known
 */
-mpd_idle_name_parse :: (name: *u8) -> mpd_idle #foreign libmpdclient;
+idle_name_parse :: (name: *u8) -> idle #foreign libmpdclient "mpd_idle_name_parse";
 
 /**
 * Enters "idle" mode: MPD will stall the response until an event has
@@ -1109,7 +1109,7 @@ mpd_idle_name_parse :: (name: *u8) -> mpd_idle #foreign libmpdclient;
 * @param connection the connection to MPD
 * @return true on success
 */
-mpd_send_idle :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_idle :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_idle";
 
 /**
 * Same as mpd_send_idle(), but listen only on specific events.
@@ -1118,7 +1118,7 @@ mpd_send_idle :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
 * @param mask a bit mask of idle events; must not be 0
 * @return true on success
 */
-mpd_send_idle_mask :: (connection: *mpd_connection, mask: mpd_idle) -> bool #foreign libmpdclient;
+send_idle_mask :: (_connection: *connection, mask: idle) -> bool #foreign libmpdclient "mpd_send_idle_mask";
 
 /**
 * Tells MPD to leave the "idle" mode.  MPD will then respond with a
@@ -1128,7 +1128,7 @@ mpd_send_idle_mask :: (connection: *mpd_connection, mask: mpd_idle) -> bool #for
 * @param connection the connection to MPD
 * @return true on success
 */
-mpd_send_noidle :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_noidle :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_noidle";
 
 /**
 * Parses a "changed" pair, which is part of MPD's response to the
@@ -1137,7 +1137,7 @@ mpd_send_noidle :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
 * @param pair the "changed" pair
 * @return an idle code, or 0 if the pair was not understood
 */
-mpd_idle_parse_pair :: (pair: *mpd_pair) -> mpd_idle #foreign libmpdclient;
+idle_parse_pair :: (_pair: *pair) -> idle #foreign libmpdclient "mpd_idle_parse_pair";
 
 /**
 * Waits until MPD sends the list of idle events and returns it in a
@@ -1151,7 +1151,7 @@ mpd_idle_parse_pair :: (pair: *mpd_pair) -> mpd_idle #foreign libmpdclient;
 * @return the event bit mask, or 0 on error or if there were no
 * events
 */
-mpd_recv_idle :: (connection: *mpd_connection, disable_timeout: bool) -> mpd_idle #foreign libmpdclient;
+recv_idle :: (_connection: *connection, disable_timeout: bool) -> idle #foreign libmpdclient "mpd_recv_idle";
 
 /**
 * Shortcut for mpd_send_idle() and mpd_recv_idle().  During
@@ -1160,7 +1160,7 @@ mpd_recv_idle :: (connection: *mpd_connection, disable_timeout: bool) -> mpd_idl
 * @param connection the connection to MPD
 * @return the event bit mask, or 0 on error
 */
-mpd_run_idle :: (connection: *mpd_connection) -> mpd_idle #foreign libmpdclient;
+run_idle :: (_connection: *connection) -> idle #foreign libmpdclient "mpd_run_idle";
 
 /**
 * Shortcut for mpd_send_idle_mask() and mpd_recv_idle().  During
@@ -1170,7 +1170,7 @@ mpd_run_idle :: (connection: *mpd_connection) -> mpd_idle #foreign libmpdclient;
 * @param mask a bit mask of idle events; must not be 0
 * @return the event bit mask, or 0 on error
 */
-mpd_run_idle_mask :: (connection: *mpd_connection, mask: mpd_idle) -> mpd_idle #foreign libmpdclient;
+run_idle_mask :: (_connection: *connection, mask: idle) -> idle #foreign libmpdclient "mpd_run_idle_mask";
 
 /**
 * Shortcut for mpd_send_noidle() and mpd_recv_idle().  During
@@ -1180,7 +1180,7 @@ mpd_run_idle_mask :: (connection: *mpd_connection, mask: mpd_idle) -> mpd_idle #
 * @return the event bit mask, or 0 on error or if there were no
 * events
 */
-mpd_run_noidle :: (connection: *mpd_connection) -> mpd_idle #foreign libmpdclient;
+run_noidle :: (_connection: *connection) -> idle #foreign libmpdclient "mpd_run_noidle";
 
 /**
 * Starts a command list, i.e. a group of pipelined commands which are
@@ -1194,7 +1194,7 @@ mpd_run_noidle :: (connection: *mpd_connection) -> mpd_idle #foreign libmpdclien
 * command with an "list_OK" response
 * @return true on success
 */
-mpd_command_list_begin :: (connection: *mpd_connection, discrete_ok: bool) -> bool #foreign libmpdclient;
+command_list_begin :: (_connection: *connection, discrete_ok: bool) -> bool #foreign libmpdclient "mpd_command_list_begin";
 
 /**
 * Commits the command list, i.e. makes MPD execute all commands which
@@ -1206,12 +1206,12 @@ mpd_command_list_begin :: (connection: *mpd_connection, discrete_ok: bool) -> bo
 * @param connection the connection to MPD
 * @return true on success
 */
-mpd_command_list_end :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+command_list_end :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_command_list_end";
 
 /**
 * \struct mpd_message
 */
-mpd_message :: struct {}
+message :: struct {}
 
 /**
 * Begins parsing a new message.
@@ -1222,7 +1222,7 @@ mpd_message :: struct {}
 *
 * @since libmpdclient 2.5
 */
-mpd_message_begin :: (pair: *mpd_pair) -> *mpd_message #foreign libmpdclient;
+message_begin :: (_pair: *pair) -> *message #foreign libmpdclient "mpd_message_begin";
 
 /**
 * Parses the pair, adding its information to the specified
@@ -1234,28 +1234,28 @@ mpd_message_begin :: (pair: *mpd_pair) -> *mpd_message #foreign libmpdclient;
 *
 * @since libmpdclient 2.5
 */
-mpd_message_feed :: (output: *mpd_message, pair: *mpd_pair) -> bool #foreign libmpdclient;
+message_feed :: (_output: *message, _pair: *pair) -> bool #foreign libmpdclient "mpd_message_feed";
 
 /**
 * Frees a #mpd_message object.
 *
 * @since libmpdclient 2.5
 */
-mpd_message_free :: (message: *mpd_message) -> void #foreign libmpdclient;
+message_free :: (_message: *message) -> void #foreign libmpdclient "mpd_message_free";
 
 /**
 * Returns the channel name.
 *
 * @since libmpdclient 2.5
 */
-mpd_message_get_channel :: (message: *mpd_message) -> *u8 #foreign libmpdclient;
+message_get_channel :: (_message: *message) -> *u8 #foreign libmpdclient "mpd_message_get_channel";
 
 /**
 * Returns the message text.
 *
 * @since libmpdclient 2.5
 */
-mpd_message_get_text :: (message: *mpd_message) -> *u8 #foreign libmpdclient;
+message_get_text :: (_message: *message) -> *u8 #foreign libmpdclient "mpd_message_get_text";
 
 /**
 * Sends the "subscribe" command: subscribe to a message channel.
@@ -1266,7 +1266,7 @@ mpd_message_get_text :: (message: *mpd_message) -> *u8 #foreign libmpdclient;
 *
 * @since libmpdclient 2.5
 */
-mpd_send_subscribe :: (connection: *mpd_connection, channel: *u8) -> bool #foreign libmpdclient;
+send_subscribe :: (_connection: *connection, channel: *u8) -> bool #foreign libmpdclient "mpd_send_subscribe";
 
 /**
 * Shortcut for mpd_send_subscribe() and mpd_response_finish().
@@ -1277,7 +1277,7 @@ mpd_send_subscribe :: (connection: *mpd_connection, channel: *u8) -> bool #forei
 *
 * @since libmpdclient 2.5
 */
-mpd_run_subscribe :: (connection: *mpd_connection, channel: *u8) -> bool #foreign libmpdclient;
+run_subscribe :: (_connection: *connection, channel: *u8) -> bool #foreign libmpdclient "mpd_run_subscribe";
 
 /**
 * Sends the "unsubscribe" command: unsubscribe from a message
@@ -1289,7 +1289,7 @@ mpd_run_subscribe :: (connection: *mpd_connection, channel: *u8) -> bool #foreig
 *
 * @since libmpdclient 2.5
 */
-mpd_send_unsubscribe :: (connection: *mpd_connection, channel: *u8) -> bool #foreign libmpdclient;
+send_unsubscribe :: (_connection: *connection, channel: *u8) -> bool #foreign libmpdclient "mpd_send_unsubscribe";
 
 /**
 * Shortcut for mpd_send_unsubscribe() and mpd_response_finish().
@@ -1300,7 +1300,7 @@ mpd_send_unsubscribe :: (connection: *mpd_connection, channel: *u8) -> bool #for
 *
 * @since libmpdclient 2.5
 */
-mpd_run_unsubscribe :: (connection: *mpd_connection, channel: *u8) -> bool #foreign libmpdclient;
+run_unsubscribe :: (_connection: *connection, channel: *u8) -> bool #foreign libmpdclient "mpd_run_unsubscribe";
 
 /**
 * Sends the "sendmessage" command: send a message to a channel.
@@ -1312,7 +1312,7 @@ mpd_run_unsubscribe :: (connection: *mpd_connection, channel: *u8) -> bool #fore
 *
 * @since libmpdclient 2.5
 */
-mpd_send_send_message :: (connection: *mpd_connection, channel: *u8, text: *u8) -> bool #foreign libmpdclient;
+send_send_message :: (_connection: *connection, channel: *u8, text: *u8) -> bool #foreign libmpdclient "mpd_send_send_message";
 
 /**
 * Shortcut for mpd_send_send_message() and mpd_response_finish().
@@ -1324,7 +1324,7 @@ mpd_send_send_message :: (connection: *mpd_connection, channel: *u8, text: *u8) 
 *
 * @since libmpdclient 2.5
 */
-mpd_run_send_message :: (connection: *mpd_connection, channel: *u8, text: *u8) -> bool #foreign libmpdclient;
+run_send_message :: (_connection: *connection, channel: *u8, text: *u8) -> bool #foreign libmpdclient "mpd_run_send_message";
 
 /**
 * Sends the "readmessages" command: send a message to a channel.
@@ -1334,7 +1334,7 @@ mpd_run_send_message :: (connection: *mpd_connection, channel: *u8, text: *u8) -
 *
 * @since libmpdclient 2.5
 */
-mpd_send_read_messages :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_read_messages :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_read_messages";
 
 /**
 * Reads the next mpd_message from the MPD response.  Free the return
@@ -1345,7 +1345,7 @@ mpd_send_read_messages :: (connection: *mpd_connection) -> bool #foreign libmpdc
 *
 * @since libmpdclient 2.5
 */
-mpd_recv_message :: (connection: *mpd_connection) -> *mpd_message #foreign libmpdclient;
+recv_message :: (_connection: *connection) -> *message #foreign libmpdclient "mpd_recv_message";
 
 /**
 * Sends the "channels" command: get a list of all channels.
@@ -1355,7 +1355,7 @@ mpd_recv_message :: (connection: *mpd_connection) -> *mpd_message #foreign libmp
 *
 * @since libmpdclient 2.5
 */
-mpd_send_channels :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_channels :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_channels";
 
 /**
 * Sets the volume of all output devices.
@@ -1364,7 +1364,7 @@ mpd_send_channels :: (connection: *mpd_connection) -> bool #foreign libmpdclient
 * @param volume the volume, an integer between 0 and 100
 * @return true on success, false on error
 */
-mpd_send_set_volume :: (connection: *mpd_connection, volume: u32) -> bool #foreign libmpdclient;
+send_set_volume :: (_connection: *connection, volume: u32) -> bool #foreign libmpdclient "mpd_send_set_volume";
 
 /**
 * Shortcut for mpd_send_set_volume() and mpd_response_finish().
@@ -1373,7 +1373,7 @@ mpd_send_set_volume :: (connection: *mpd_connection, volume: u32) -> bool #forei
 * @param volume the volume, an integer between 0 and 100
 * @return true on success, false on error
 */
-mpd_run_set_volume :: (connection: *mpd_connection, volume: u32) -> bool #foreign libmpdclient;
+run_set_volume :: (_connection: *connection, volume: u32) -> bool #foreign libmpdclient "mpd_run_set_volume";
 
 /**
 * Changes the volume of all output devices.
@@ -1384,7 +1384,7 @@ mpd_run_set_volume :: (connection: *mpd_connection, volume: u32) -> bool #foreig
 *
 * @since libmpdclient 2.9
 */
-mpd_send_change_volume :: (connection: *mpd_connection, relative_volume: s32) -> bool #foreign libmpdclient;
+send_change_volume :: (_connection: *connection, relative_volume: s32) -> bool #foreign libmpdclient "mpd_send_change_volume";
 
 /**
 * Shortcut for mpd_send_change_volume() and mpd_response_finish().
@@ -1395,7 +1395,7 @@ mpd_send_change_volume :: (connection: *mpd_connection, relative_volume: s32) ->
 *
 * @since libmpdclient 2.9
 */
-mpd_run_change_volume :: (connection: *mpd_connection, relative_volume: s32) -> bool #foreign libmpdclient;
+run_change_volume :: (_connection: *connection, relative_volume: s32) -> bool #foreign libmpdclient "mpd_run_change_volume";
 
 /**
 * Sends the "getvol" command to MPD.  Call mpd_recv_pair() to
@@ -1406,7 +1406,7 @@ mpd_run_change_volume :: (connection: *mpd_connection, relative_volume: s32) -> 
 *
 * @since libmpdclient 2.20, MPD 0.23
 */
-mpd_send_get_volume :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_get_volume :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_get_volume";
 
 /**
 * Shortcut for mpd_send_get_volume(), mpd_recv_pair_named() and
@@ -1417,14 +1417,14 @@ mpd_send_get_volume :: (connection: *mpd_connection) -> bool #foreign libmpdclie
 *
 * @since libmpdclient 2.20, MPD 0.23
 */
-mpd_run_get_volume :: (connection: *mpd_connection) -> s32 #foreign libmpdclient;
+run_get_volume :: (_connection: *connection) -> s32 #foreign libmpdclient "mpd_run_get_volume";
 
 /**
 * \struct mpd_mount
 *
 * This type represents a mount point on the MPD server.
 */
-mpd_mount :: struct {}
+mount :: struct {}
 
 /**
 * Begins parsing a new #mpd_mount.
@@ -1435,7 +1435,7 @@ mpd_mount :: struct {}
 *
 * @since libmpdclient 2.16
 */
-mpd_mount_begin :: (pair: *mpd_pair) -> *mpd_mount #foreign libmpdclient;
+mount_begin :: (_pair: *pair) -> *mount #foreign libmpdclient "mpd_mount_begin";
 
 /**
 * Parses the pair, adding its information to the specified
@@ -1447,21 +1447,21 @@ mpd_mount_begin :: (pair: *mpd_pair) -> *mpd_mount #foreign libmpdclient;
 *
 * @since libmpdclient 2.16
 */
-mpd_mount_feed :: (mnt: *mpd_mount, pair: *mpd_pair) -> bool #foreign libmpdclient;
+mount_feed :: (mnt: *mount, _pair: *pair) -> bool #foreign libmpdclient "mpd_mount_feed";
 
 /**
 * Frees a mpd_mount object returned from mpd_recv_mount() or mpd_mount_begin().
 *
 * @since libmpdclient 2.16
 */
-mpd_mount_free :: (mount: *mpd_mount) -> void #foreign libmpdclient;
+mount_free :: (_mount: *mount) -> void #foreign libmpdclient "mpd_mount_free";
 
 /**
 * @return the mount point URI of the specified #mpd_mount object
 *
 * @since libmpdclient 2.16
 */
-mpd_mount_get_uri :: (mnt: *mpd_mount) -> *u8 #foreign libmpdclient;
+mount_get_uri :: (mnt: *mount) -> *u8 #foreign libmpdclient "mpd_mount_get_uri";
 
 /**
 * @return the mounted storage URI of the specified #mpd_mount object;
@@ -1469,7 +1469,7 @@ mpd_mount_get_uri :: (mnt: *mpd_mount) -> *u8 #foreign libmpdclient;
 *
 * @since libmpdclient 2.16
 */
-mpd_mount_get_storage :: (mnt: *mpd_mount) -> *u8 #foreign libmpdclient;
+mount_get_storage :: (mnt: *mount) -> *u8 #foreign libmpdclient "mpd_mount_get_storage";
 
 /**
 * Sends the "listmounts" command to MPD.  Call mpd_recv_mount() to
@@ -1480,7 +1480,7 @@ mpd_mount_get_storage :: (mnt: *mpd_mount) -> *u8 #foreign libmpdclient;
 *
 * @since libmpdclient 2.16, MPD 0.19
 */
-mpd_send_list_mounts :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_list_mounts :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_list_mounts";
 
 /**
 * Reads the next mpd_mount from the MPD response.  Free the return
@@ -1491,7 +1491,7 @@ mpd_send_list_mounts :: (connection: *mpd_connection) -> bool #foreign libmpdcli
 *
 * @since libmpdclient 2.16, MPD 0.19
 */
-mpd_recv_mount :: (connection: *mpd_connection) -> *mpd_mount #foreign libmpdclient;
+recv_mount :: (_connection: *connection) -> *mount #foreign libmpdclient "mpd_recv_mount";
 
 /**
 * Sends the "mount" command to MPD.
@@ -1503,7 +1503,7 @@ mpd_recv_mount :: (connection: *mpd_connection) -> *mpd_mount #foreign libmpdcli
 *
 * @since libmpdclient 2.16, MPD 0.19
 */
-mpd_send_mount :: (connection: *mpd_connection, uri: *u8, storage: *u8) -> bool #foreign libmpdclient;
+send_mount :: (_connection: *connection, uri: *u8, storage: *u8) -> bool #foreign libmpdclient "mpd_send_mount";
 
 /**
 * Shortcut for mpd_send_mount() and mpd_response_finish().
@@ -1515,7 +1515,7 @@ mpd_send_mount :: (connection: *mpd_connection, uri: *u8, storage: *u8) -> bool 
 *
 * @since libmpdclient 2.16, MPD 0.19
 */
-mpd_run_mount :: (connection: *mpd_connection, uri: *u8, storage: *u8) -> bool #foreign libmpdclient;
+run_mount :: (_connection: *connection, uri: *u8, storage: *u8) -> bool #foreign libmpdclient "mpd_run_mount";
 
 /**
 * Sends the "unmount" command to MPD.
@@ -1526,7 +1526,7 @@ mpd_run_mount :: (connection: *mpd_connection, uri: *u8, storage: *u8) -> bool #
 *
 * @since libmpdclient 2.16, MPD 0.19
 */
-mpd_send_unmount :: (connection: *mpd_connection, uri: *u8) -> bool #foreign libmpdclient;
+send_unmount :: (_connection: *connection, uri: *u8) -> bool #foreign libmpdclient "mpd_send_unmount";
 
 /**
 * Shortcut for mpd_send_unmount() and mpd_response_finish().
@@ -1537,7 +1537,7 @@ mpd_send_unmount :: (connection: *mpd_connection, uri: *u8) -> bool #foreign lib
 *
 * @since libmpdclient 2.16, MPD 0.19
 */
-mpd_run_unmount :: (connection: *mpd_connection, uri: *u8) -> bool #foreign libmpdclient;
+run_unmount :: (_connection: *connection, uri: *u8) -> bool #foreign libmpdclient "mpd_run_unmount";
 
 /**
 * \struct mpd_neighbor
@@ -1545,7 +1545,7 @@ mpd_run_unmount :: (connection: *mpd_connection, uri: *u8) -> bool #foreign libm
 * This type represents a neighbor (accessible file servers on the local net)
 * on the MPD server.
 */
-mpd_neighbor :: struct {}
+neighbor :: struct {}
 
 /**
 * Begins parsing a new #mpd_neighbor.
@@ -1556,7 +1556,7 @@ mpd_neighbor :: struct {}
 *
 * @since libmpdclient 2.17
 */
-mpd_neighbor_begin :: (pair: *mpd_pair) -> *mpd_neighbor #foreign libmpdclient;
+neighbor_begin :: (_pair: *pair) -> *neighbor #foreign libmpdclient "mpd_neighbor_begin";
 
 /**
 * Parses the pair, adding its information to the specified
@@ -1568,7 +1568,7 @@ mpd_neighbor_begin :: (pair: *mpd_pair) -> *mpd_neighbor #foreign libmpdclient;
 *
 * @since libmpdclient 2.17
 */
-mpd_neighbor_feed :: (neighbor: *mpd_neighbor, pair: *mpd_pair) -> bool #foreign libmpdclient;
+neighbor_feed :: (_neighbor: *neighbor, _pair: *pair) -> bool #foreign libmpdclient "mpd_neighbor_feed";
 
 /**
 * Frees a #mpd_neighbor object returned from mpd_recv_neighbor() or 
@@ -1576,21 +1576,21 @@ mpd_neighbor_feed :: (neighbor: *mpd_neighbor, pair: *mpd_pair) -> bool #foreign
 *
 * @since libmpdclient 2.17
 */
-mpd_neighbor_free :: (neighbor: *mpd_neighbor) -> void #foreign libmpdclient;
+neighbor_free :: (_neighbor: *neighbor) -> void #foreign libmpdclient "mpd_neighbor_free";
 
 /**
 * @return the neighbor mount point URI of the specified #mpd_neighbor object
 *
 * @since libmpdclient 2.17
 */
-mpd_neighbor_get_uri :: (neighbor: *mpd_neighbor) -> *u8 #foreign libmpdclient;
+neighbor_get_uri :: (_neighbor: *neighbor) -> *u8 #foreign libmpdclient "mpd_neighbor_get_uri";
 
 /**
 * @return the display name of the specified #mpd_neighbor object;
 *
 * @since libmpdclient 2.17
 */
-mpd_neighbor_get_display_name :: (neighbor: *mpd_neighbor) -> *u8 #foreign libmpdclient;
+neighbor_get_display_name :: (_neighbor: *neighbor) -> *u8 #foreign libmpdclient "mpd_neighbor_get_display_name";
 
 /**
 * Sends the "listneighbors" command to MPD: queries a list of "neighbors"
@@ -1602,7 +1602,7 @@ mpd_neighbor_get_display_name :: (neighbor: *mpd_neighbor) -> *u8 #foreign libmp
 *
 * @since libmpdclient 2.17, MPD 0.19
 */
-mpd_send_list_neighbors :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_list_neighbors :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_list_neighbors";
 
 /**
 * Reads the next mpd_neighbor from the MPD response.  Free the return
@@ -1613,14 +1613,14 @@ mpd_send_list_neighbors :: (connection: *mpd_connection) -> bool #foreign libmpd
 *
 * @since libmpdclient 2.17, MPD 0.19
 */
-mpd_recv_neighbor :: (connection: *mpd_connection) -> *mpd_neighbor #foreign libmpdclient;
+recv_neighbor :: (_connection: *connection) -> *neighbor #foreign libmpdclient "mpd_recv_neighbor";
 
 /**
 * \struct mpd_output
 *
 * This type represents an audio output device on the MPD server.
 */
-mpd_output :: struct {}
+output :: struct {}
 
 /**
 * Begins parsing a new #mpd_output.
@@ -1629,7 +1629,7 @@ mpd_output :: struct {}
 * @return the new #mpd_output object, or NULL on error (out of
 * memory, or wrong pair name)
 */
-mpd_output_begin :: (pair: *mpd_pair) -> *mpd_output #foreign libmpdclient;
+output_begin :: (_pair: *pair) -> *output #foreign libmpdclient "mpd_output_begin";
 
 /**
 * Parses the pair, adding its information to the specified
@@ -1639,23 +1639,23 @@ mpd_output_begin :: (pair: *mpd_pair) -> *mpd_output #foreign libmpdclient;
 * the pair was not understood and ignored), false if this pair is the
 * beginning of the next output
 */
-mpd_output_feed :: (output: *mpd_output, pair: *mpd_pair) -> bool #foreign libmpdclient;
+output_feed :: (_output: *output, _pair: *pair) -> bool #foreign libmpdclient "mpd_output_feed";
 
 /**
 * Frees a mpd_output object returned from mpd_recv_output() or
 * mpd_output_begin().
 */
-mpd_output_free :: (output: *mpd_output) -> void #foreign libmpdclient;
+output_free :: (_output: *output) -> void #foreign libmpdclient "mpd_output_free";
 
 /**
 * @return the id of the specified #mpd_output object
 */
-mpd_output_get_id :: (output: *mpd_output) -> u32 #foreign libmpdclient;
+output_get_id :: (_output: *output) -> u32 #foreign libmpdclient "mpd_output_get_id";
 
 /**
 * @return the configured name of the specified #mpd_output object
 */
-mpd_output_get_name :: (output: *mpd_output) -> *u8 #foreign libmpdclient;
+output_get_name :: (_output: *output) -> *u8 #foreign libmpdclient "mpd_output_get_name";
 
 /**
 * @return the plugin of the specified #mpd_output object, or NULL if
@@ -1663,12 +1663,12 @@ mpd_output_get_name :: (output: *mpd_output) -> *u8 #foreign libmpdclient;
 *
 * @since libmpdclient 2.14, MPD 0.21
 */
-mpd_output_get_plugin :: (output: *mpd_output) -> *u8 #foreign libmpdclient;
+output_get_plugin :: (_output: *output) -> *u8 #foreign libmpdclient "mpd_output_get_plugin";
 
 /**
 * @return true if this output is enabled
 */
-mpd_output_get_enabled :: (output: *mpd_output) -> bool #foreign libmpdclient;
+output_get_enabled :: (_output: *output) -> bool #foreign libmpdclient "mpd_output_get_enabled";
 
 /**
 * Find an attribute with the given name and return its value.
@@ -1677,7 +1677,7 @@ mpd_output_get_enabled :: (output: *mpd_output) -> bool #foreign libmpdclient;
 *
 * @since libmpdclient 2.16, MPD 0.21
 */
-mpd_output_get_attribute :: (output: *mpd_output, name: *u8) -> *u8 #foreign libmpdclient;
+output_get_attribute :: (_output: *output, name: *u8) -> *u8 #foreign libmpdclient "mpd_output_get_attribute";
 
 /**
 * Obtains the first attribute for this output.  This rewinds the
@@ -1689,7 +1689,7 @@ mpd_output_get_attribute :: (output: *mpd_output, name: *u8) -> *u8 #foreign lib
 *
 * @since libmpdclient 2.14, MPD 0.21
 */
-mpd_output_first_attribute :: (output: *mpd_output) -> *mpd_pair #foreign libmpdclient;
+output_first_attribute :: (_output: *output) -> *pair #foreign libmpdclient "mpd_output_first_attribute";
 
 /**
 * Obtains the next attribute for this output.  Call this function
@@ -1700,7 +1700,7 @@ mpd_output_first_attribute :: (output: *mpd_output) -> *mpd_pair #foreign libmpd
 *
 * @since libmpdclient 2.14, MPD 0.21
 */
-mpd_output_next_attribute :: (output: *mpd_output) -> *mpd_pair #foreign libmpdclient;
+output_next_attribute :: (_output: *output) -> *pair #foreign libmpdclient "mpd_output_next_attribute";
 
 /**
 * Sends the "outputs" command to MPD: fetch information about all outputs.
@@ -1709,7 +1709,7 @@ mpd_output_next_attribute :: (output: *mpd_output) -> *mpd_pair #foreign libmpdc
 * @param connection A valid and connected mpd_connection.
 * @return true on success
 */
-mpd_send_outputs :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_outputs :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_outputs";
 
 /**
 * Reads the next mpd_output from the MPD response.  Free the return
@@ -1718,7 +1718,7 @@ mpd_send_outputs :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
 * @return a mpd_output object on success, NULL on error or
 * end-of-response
 */
-mpd_recv_output :: (connection: *mpd_connection) -> *mpd_output #foreign libmpdclient;
+recv_output :: (_connection: *connection) -> *output #foreign libmpdclient "mpd_recv_output";
 
 /**
 * Sends the "enableoutput" command to MPD.
@@ -1728,7 +1728,7 @@ mpd_recv_output :: (connection: *mpd_connection) -> *mpd_output #foreign libmpdc
 * mpd_recv_output())
 * @return true on success
 */
-mpd_send_enable_output :: (connection: *mpd_connection, output_id: u32) -> bool #foreign libmpdclient;
+send_enable_output :: (_connection: *connection, output_id: u32) -> bool #foreign libmpdclient "mpd_send_enable_output";
 
 /**
 * Shortcut for mpd_send_enable_output() and mpd_response_finish().
@@ -1738,7 +1738,7 @@ mpd_send_enable_output :: (connection: *mpd_connection, output_id: u32) -> bool 
 * mpd_recv_output())
 * @return true on success
 */
-mpd_run_enable_output :: (connection: *mpd_connection, output_id: u32) -> bool #foreign libmpdclient;
+run_enable_output :: (_connection: *connection, output_id: u32) -> bool #foreign libmpdclient "mpd_run_enable_output";
 
 /**
 * Sends the "disableoutput" command to MPD.
@@ -1748,7 +1748,7 @@ mpd_run_enable_output :: (connection: *mpd_connection, output_id: u32) -> bool #
 * mpd_recv_output())
 * @return true on success
 */
-mpd_send_disable_output :: (connection: *mpd_connection, output_id: u32) -> bool #foreign libmpdclient;
+send_disable_output :: (_connection: *connection, output_id: u32) -> bool #foreign libmpdclient "mpd_send_disable_output";
 
 /**
 * Shortcut for mpd_send_disable_output() and mpd_response_finish().
@@ -1758,7 +1758,7 @@ mpd_send_disable_output :: (connection: *mpd_connection, output_id: u32) -> bool
 * mpd_recv_output())
 * @return true on success
 */
-mpd_run_disable_output :: (connection: *mpd_connection, output_id: u32) -> bool #foreign libmpdclient;
+run_disable_output :: (_connection: *connection, output_id: u32) -> bool #foreign libmpdclient "mpd_run_disable_output";
 
 /**
 * Sends the "toggleoutput" command to MPD.
@@ -1770,7 +1770,7 @@ mpd_run_disable_output :: (connection: *mpd_connection, output_id: u32) -> bool 
 *
 * @since libmpdclient 2.9
 */
-mpd_send_toggle_output :: (connection: *mpd_connection, output_id: u32) -> bool #foreign libmpdclient;
+send_toggle_output :: (_connection: *connection, output_id: u32) -> bool #foreign libmpdclient "mpd_send_toggle_output";
 
 /**
 * Shortcut for mpd_send_toggle_output() and mpd_response_finish().
@@ -1782,7 +1782,7 @@ mpd_send_toggle_output :: (connection: *mpd_connection, output_id: u32) -> bool 
 *
 * @since libmpdclient 2.9
 */
-mpd_run_toggle_output :: (connection: *mpd_connection, output_id: u32) -> bool #foreign libmpdclient;
+run_toggle_output :: (_connection: *connection, output_id: u32) -> bool #foreign libmpdclient "mpd_run_toggle_output";
 
 /**
 * Sends the "outputset" command to MPD: set a runtime attribute for the
@@ -1797,14 +1797,14 @@ mpd_run_toggle_output :: (connection: *mpd_connection, output_id: u32) -> bool #
 *
 * @since libmpdclient 2.14, MPD 0.21
 */
-mpd_send_output_set :: (connection: *mpd_connection, output_id: u32, attribute_name: *u8, attribute_value: *u8) -> bool #foreign libmpdclient;
+send_output_set :: (_connection: *connection, output_id: u32, attribute_name: *u8, attribute_value: *u8) -> bool #foreign libmpdclient "mpd_send_output_set";
 
 /**
 * Shortcut for mpd_send_output_set() and mpd_response_finish().
 *
 * @since libmpdclient 2.14, MPD 0.21
 */
-mpd_run_output_set :: (connection: *mpd_connection, output_id: u32, attribute_name: *u8, attribute_value: *u8) -> bool #foreign libmpdclient;
+run_output_set :: (_connection: *connection, output_id: u32, attribute_name: *u8, attribute_value: *u8) -> bool #foreign libmpdclient "mpd_run_output_set";
 
 /**
 * Move an output to the current partition.
@@ -1815,7 +1815,7 @@ mpd_run_output_set :: (connection: *mpd_connection, output_id: u32, attribute_na
 *
 * @since libmpdclient 2.18, MPD 0.22.
 */
-mpd_send_move_output :: (connection: *mpd_connection, output_name: *u8) -> bool #foreign libmpdclient;
+send_move_output :: (_connection: *connection, output_name: *u8) -> bool #foreign libmpdclient "mpd_send_move_output";
 
 /**
 * Shortcut for mpd_send_move_output() and mpd_response_finish().
@@ -1826,12 +1826,12 @@ mpd_send_move_output :: (connection: *mpd_connection, output_name: *u8) -> bool 
 *
 * @since libmpdclient 2.18, MPD 0.22.
 */
-mpd_run_move_output :: (connection: *mpd_connection, output_name: *u8) -> bool #foreign libmpdclient;
+run_move_output :: (_connection: *connection, output_name: *u8) -> bool #foreign libmpdclient "mpd_run_move_output";
 
 /**
 * A name-value pair received from the MPD server.
 */
-mpd_pair :: struct {
+pair :: struct {
     /** the name of the element */
     name:  *u8;
     /** the value of the element */
@@ -1841,7 +1841,7 @@ mpd_pair :: struct {
 /**
 * \struct mpd_partition
 */
-mpd_partition :: struct {}
+partition :: struct {}
 
 /**
 * Creates a new partition object from the pair received from MPD server.
@@ -1852,21 +1852,21 @@ mpd_partition :: struct {}
 *
 * @since libmpdclient 2.17
 */
-mpd_partition_new :: (pair: *mpd_pair) -> *mpd_partition #foreign libmpdclient;
+partition_new :: (_pair: *pair) -> *partition #foreign libmpdclient "mpd_partition_new";
 
 /**
 * Frees a #mpd_partition object.
 *
 * @since libmpdclient 2.17
 */
-mpd_partition_free :: (partition: *mpd_partition) -> void #foreign libmpdclient;
+partition_free :: (_partition: *partition) -> void #foreign libmpdclient "mpd_partition_free";
 
 /**
 * Returns the partition name.
 *
 * @since libmpdclient 2.17
 */
-mpd_partition_get_name :: (partition: *mpd_partition) -> *u8 #foreign libmpdclient;
+partition_get_name :: (_partition: *partition) -> *u8 #foreign libmpdclient "mpd_partition_get_name";
 
 /**
 * Creates a new partition.
@@ -1879,7 +1879,7 @@ mpd_partition_get_name :: (partition: *mpd_partition) -> *u8 #foreign libmpdclie
 *
 * @since libmpdclient 2.17
 */
-mpd_send_newpartition :: (connection: *mpd_connection, partition: *u8) -> bool #foreign libmpdclient;
+send_newpartition :: (_connection: *connection, _partition: *u8) -> bool #foreign libmpdclient "mpd_send_newpartition";
 
 /**
 * Shortcut for mpd_send_newpartition() and mpd_response_finish().
@@ -1890,7 +1890,7 @@ mpd_send_newpartition :: (connection: *mpd_connection, partition: *u8) -> bool #
 *
 * @since libmpdclient 2.17
 */
-mpd_run_newpartition :: (connection: *mpd_connection, partition: *u8) -> bool #foreign libmpdclient;
+run_newpartition :: (_connection: *connection, _partition: *u8) -> bool #foreign libmpdclient "mpd_run_newpartition";
 
 /**
 * Delete a partition.
@@ -1901,7 +1901,7 @@ mpd_run_newpartition :: (connection: *mpd_connection, partition: *u8) -> bool #f
 *
 * @since libmpdclient 2.18, MPD 0.22
 */
-mpd_send_delete_partition :: (connection: *mpd_connection, partition: *u8) -> bool #foreign libmpdclient;
+send_delete_partition :: (_connection: *connection, _partition: *u8) -> bool #foreign libmpdclient "mpd_send_delete_partition";
 
 /**
 * Shortcut for mpd_send_delete_partition() and mpd_response_finish().
@@ -1912,7 +1912,7 @@ mpd_send_delete_partition :: (connection: *mpd_connection, partition: *u8) -> bo
 *
 * @since libmpdclient 2.18, MPD 0.22
 */
-mpd_run_delete_partition :: (connection: *mpd_connection, partition: *u8) -> bool #foreign libmpdclient;
+run_delete_partition :: (_connection: *connection, _partition: *u8) -> bool #foreign libmpdclient "mpd_run_delete_partition";
 
 /**
 * Switch the client to a different partition.
@@ -1923,7 +1923,7 @@ mpd_run_delete_partition :: (connection: *mpd_connection, partition: *u8) -> boo
 *
 * @since libmpdclient 2.17
 */
-mpd_send_switch_partition :: (connection: *mpd_connection, partition: *u8) -> bool #foreign libmpdclient;
+send_switch_partition :: (_connection: *connection, _partition: *u8) -> bool #foreign libmpdclient "mpd_send_switch_partition";
 
 /**
 * Shortcut for mpd_send_switch_partition() and mpd_response_finish().
@@ -1934,7 +1934,7 @@ mpd_send_switch_partition :: (connection: *mpd_connection, partition: *u8) -> bo
 *
 * @since libmpdclient 2.17
 */
-mpd_run_switch_partition :: (connection: *mpd_connection, partition: *u8) -> bool #foreign libmpdclient;
+run_switch_partition :: (_connection: *connection, _partition: *u8) -> bool #foreign libmpdclient "mpd_run_switch_partition";
 
 /**
 * Sends the "listpartitions" command: request the list of partitions.
@@ -1945,7 +1945,7 @@ mpd_run_switch_partition :: (connection: *mpd_connection, partition: *u8) -> boo
 *
 * @since libmpdclient 2.17
 */
-mpd_send_listpartitions :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_listpartitions :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_listpartitions";
 
 /**
 * Reads the next #mpd_partition from the MPD response.  Free the
@@ -1956,24 +1956,24 @@ mpd_send_listpartitions :: (connection: *mpd_connection) -> bool #foreign libmpd
 *
 * @since libmpdclient 2.18
 */
-mpd_recv_partition :: (connection: *mpd_connection) -> *mpd_partition #foreign libmpdclient;
+recv_partition :: (_connection: *connection) -> *partition #foreign libmpdclient "mpd_recv_partition";
 
 /**
 * Sends the password to MPD, to gain more privileges.
 */
-mpd_send_password :: (connection: *mpd_connection, password: *u8) -> bool #foreign libmpdclient;
+send_password :: (_connection: *connection, password: *u8) -> bool #foreign libmpdclient "mpd_send_password";
 
 /**
 * Sends the password to MPD and receives its response.
 *
 * @return true on success, false on failure
 */
-mpd_run_password :: (connection: *mpd_connection, password: *u8) -> bool #foreign libmpdclient;
+run_password :: (_connection: *connection, password: *u8) -> bool #foreign libmpdclient "mpd_run_password";
 
 /**
 * MPD's playback state.
 */
-mpd_state :: enum u32 {
+state :: enum u32 {
     UNKNOWN :: 0;
     STOP    :: 1;
     PLAY    :: 2;
@@ -1985,7 +1985,7 @@ mpd_state :: enum u32 {
 *
 * @since libmpdclient 2.18, MPD 0.21.
 */
-mpd_single_state :: enum u32 {
+single_state :: enum u32 {
     OFF     :: 0;
     ON      :: 1;
     ONESHOT :: 2;
@@ -1997,7 +1997,7 @@ mpd_single_state :: enum u32 {
 *
 * Holds information about MPD's status.
 */
-mpd_status :: struct {}
+status :: struct {}
 
 /**
 * Begins parsing the server status: creates a new empty #mpd_status
@@ -2006,13 +2006,13 @@ mpd_status :: struct {}
 * @return the newly allocated #mpd_status object, or NULL if out of
 * memory
 */
-mpd_status_begin :: () -> *mpd_status #foreign libmpdclient;
+status_begin :: () -> *status #foreign libmpdclient "mpd_status_begin";
 
 /**
 * Parses the pair, adding its information to the specified
 * #mpd_status object.
 */
-mpd_status_feed :: (status: *mpd_status, pair: *mpd_pair) -> void #foreign libmpdclient;
+status_feed :: (_status: *status, _pair: *pair) -> void #foreign libmpdclient "mpd_status_feed";
 
 /**
 * Sends the "status" command to MPD.  Call mpd_recv_status() to read
@@ -2020,14 +2020,14 @@ mpd_status_feed :: (status: *mpd_status, pair: *mpd_pair) -> void #foreign libmp
 *
 * @return true on success
 */
-mpd_send_status :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_status :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_status";
 
 /**
 * Receives a #mpd_status object from the server.
 *
 * @return the received #mpd_status object, or NULL on error
 */
-mpd_recv_status :: (connection: *mpd_connection) -> *mpd_status #foreign libmpdclient;
+recv_status :: (_connection: *connection) -> *status #foreign libmpdclient "mpd_recv_status";
 
 /**
 * Executes the "status" command and reads the response.
@@ -2035,28 +2035,28 @@ mpd_recv_status :: (connection: *mpd_connection) -> *mpd_status #foreign libmpdc
 * @return the #mpd_status object returned by the server, or NULL on
 * error
 */
-mpd_run_status :: (connection: *mpd_connection) -> *mpd_status #foreign libmpdclient;
+run_status :: (_connection: *connection) -> *status #foreign libmpdclient "mpd_run_status";
 
 /**
 * Releases a #mpd_status object.
 */
-mpd_status_free :: (status: *mpd_status) -> void #foreign libmpdclient;
+status_free :: (_status: *status) -> void #foreign libmpdclient "mpd_status_free";
 
 /**
 * Returns the current volume: 0-100, or -1 when there is no volume
 * support.
 */
-mpd_status_get_volume :: (status: *mpd_status) -> s32 #foreign libmpdclient;
+status_get_volume :: (_status: *status) -> s32 #foreign libmpdclient "mpd_status_get_volume";
 
 /**
 * Returns true if repeat mode is on.
 */
-mpd_status_get_repeat :: (status: *mpd_status) -> bool #foreign libmpdclient;
+status_get_repeat :: (_status: *status) -> bool #foreign libmpdclient "mpd_status_get_repeat";
 
 /**
 * Returns true if random mode is on.
 */
-mpd_status_get_random :: (status: *mpd_status) -> bool #foreign libmpdclient;
+status_get_random :: (_status: *status) -> bool #foreign libmpdclient "mpd_status_get_random";
 
 /**
 * Returns the current state of single mode on MPD.
@@ -2068,7 +2068,7 @@ mpd_status_get_random :: (status: *mpd_status) -> bool #foreign libmpdclient;
 *
 * @since MPD 0.21, libmpdclient 2.18.
 */
-mpd_status_get_single_state :: (status: *mpd_status) -> mpd_single_state #foreign libmpdclient;
+status_get_single_state :: (_status: *status) -> single_state #foreign libmpdclient "mpd_status_get_single_state";
 
 /**
 * This function is deprecated as it does not distinguish the states of
@@ -2077,42 +2077,42 @@ mpd_status_get_single_state :: (status: *mpd_status) -> mpd_single_state #foreig
 *
 * Returns true if single mode is either on or in oneshot.
 */
-mpd_status_get_single :: (status: *mpd_status) -> bool #foreign libmpdclient;
+status_get_single :: (_status: *status) -> bool #foreign libmpdclient "mpd_status_get_single";
 
 /**
 * Returns true if consume mode is on.
 */
-mpd_status_get_consume :: (status: *mpd_status) -> bool #foreign libmpdclient;
+status_get_consume :: (_status: *status) -> bool #foreign libmpdclient "mpd_status_get_consume";
 
 /**
 * Returns the number of songs in the queue.  If MPD did not
 * specify that, this function returns 0.
 */
-mpd_status_get_queue_length :: (status: *mpd_status) -> u32 #foreign libmpdclient;
+status_get_queue_length :: (_status: *status) -> u32 #foreign libmpdclient "mpd_status_get_queue_length";
 
 /**
 * Returns queue version number.  You may use this to determine
 * when the queue has changed since you have last queried it.
 */
-mpd_status_get_queue_version :: (status: *mpd_status) -> u32 #foreign libmpdclient;
+status_get_queue_version :: (_status: *status) -> u32 #foreign libmpdclient "mpd_status_get_queue_version";
 
 /**
 * Returns the state of the player: either stopped, playing or paused.
 */
-mpd_status_get_state :: (status: *mpd_status) -> mpd_state #foreign libmpdclient;
+status_get_state :: (_status: *status) -> state #foreign libmpdclient "mpd_status_get_state";
 
 /**
 * Returns crossfade setting in seconds.  0 means crossfading is
 * disabled.
 */
-mpd_status_get_crossfade :: (status: *mpd_status) -> u32 #foreign libmpdclient;
+status_get_crossfade :: (_status: *status) -> u32 #foreign libmpdclient "mpd_status_get_crossfade";
 
 /**
 * Returns mixrampdb setting in db. 0 means mixrampdb is disabled.
 *
 * @since libmpdclient 2.2
 */
-mpd_status_get_mixrampdb :: (status: *mpd_status) -> float #foreign libmpdclient;
+status_get_mixrampdb :: (_status: *status) -> float #foreign libmpdclient "mpd_status_get_mixrampdb";
 
 /**
 * Returns mixrampdelay setting in seconds.  Negative means mixrampdelay is
@@ -2120,7 +2120,7 @@ mpd_status_get_mixrampdb :: (status: *mpd_status) -> float #foreign libmpdclient
 *
 * @since libmpdclient 2.2
 */
-mpd_status_get_mixrampdelay :: (status: *mpd_status) -> float #foreign libmpdclient;
+status_get_mixrampdelay :: (_status: *status) -> float #foreign libmpdclient "mpd_status_get_mixrampdelay";
 
 /**
 * Returns the position of the currently playing song in the queue
@@ -2128,13 +2128,13 @@ mpd_status_get_mixrampdelay :: (status: *mpd_status) -> float #foreign libmpdcli
 * state is MPD_STATE_PLAY or MPD_STATE_PAUSE).  If there is no current song,
 * -1 is returned.
 */
-mpd_status_get_song_pos :: (status: *mpd_status) -> s32 #foreign libmpdclient;
+status_get_song_pos :: (_status: *status) -> s32 #foreign libmpdclient "mpd_status_get_song_pos";
 
 /**
 * Returns the id of the current song.  If there is no current song,
 * -1 is returned.
 */
-mpd_status_get_song_id :: (status: *mpd_status) -> s32 #foreign libmpdclient;
+status_get_song_id :: (_status: *status) -> s32 #foreign libmpdclient "mpd_status_get_song_id";
 
 /**
 * The same as mpd_status_get_song_pos(), but for the next song to be
@@ -2142,7 +2142,7 @@ mpd_status_get_song_id :: (status: *mpd_status) -> s32 #foreign libmpdclient;
 *
 * @since libmpdclient 2.7
 */
-mpd_status_get_next_song_pos :: (status: *mpd_status) -> s32 #foreign libmpdclient;
+status_get_next_song_pos :: (_status: *status) -> s32 #foreign libmpdclient "mpd_status_get_next_song_pos";
 
 /**
 * Returns the id of the next song to be played.  If it is not known, -1 is
@@ -2150,7 +2150,7 @@ mpd_status_get_next_song_pos :: (status: *mpd_status) -> s32 #foreign libmpdclie
 *
 * @since libmpdclient 2.7
 */
-mpd_status_get_next_song_id :: (status: *mpd_status) -> s32 #foreign libmpdclient;
+status_get_next_song_id :: (_status: *status) -> s32 #foreign libmpdclient "mpd_status_get_next_song_id";
 
 /**
 * This function uses a deprecated feature of MPD, call
@@ -2160,7 +2160,7 @@ mpd_status_get_next_song_id :: (status: *mpd_status) -> s32 #foreign libmpdclien
 * song.
 *
 */
-mpd_status_get_elapsed_time :: (status: *mpd_status) -> u32 #foreign libmpdclient;
+status_get_elapsed_time :: (_status: *status) -> u32 #foreign libmpdclient "mpd_status_get_elapsed_time";
 
 /**
 * Returns time in milliseconds that have elapsed in the currently
@@ -2168,39 +2168,39 @@ mpd_status_get_elapsed_time :: (status: *mpd_status) -> u32 #foreign libmpdclien
 *
 * @since libmpdclient 2.1
 */
-mpd_status_get_elapsed_ms :: (status: *mpd_status) -> u32 #foreign libmpdclient;
+status_get_elapsed_ms :: (_status: *status) -> u32 #foreign libmpdclient "mpd_status_get_elapsed_ms";
 
 /**
 * Returns the length in seconds of the currently playing/paused song
 */
-mpd_status_get_total_time :: (status: *mpd_status) -> u32 #foreign libmpdclient;
+status_get_total_time :: (_status: *status) -> u32 #foreign libmpdclient "mpd_status_get_total_time";
 
 /**
 * Returns current bit rate in kbps.  0 means unknown.
 */
-mpd_status_get_kbit_rate :: (status: *mpd_status) -> u32 #foreign libmpdclient;
+status_get_kbit_rate :: (_status: *status) -> u32 #foreign libmpdclient "mpd_status_get_kbit_rate";
 
 /**
 * Returns audio format which MPD is currently playing.  May return
 * NULL if MPD is not playing or if the audio format is unknown.
 */
-mpd_status_get_audio_format :: (status: *mpd_status) -> *mpd_audio_format #foreign libmpdclient;
+status_get_audio_format :: (_status: *status) -> *audio_format #foreign libmpdclient "mpd_status_get_audio_format";
 
 /**
 * Returns 1 if mpd is updating, 0 otherwise
 */
-mpd_status_get_update_id :: (status: *mpd_status) -> u32 #foreign libmpdclient;
+status_get_update_id :: (_status: *status) -> u32 #foreign libmpdclient "mpd_status_get_update_id";
 
 /**
 * Returns the name of the current partition or NULL if the server did
 * not send a name.
 */
-mpd_status_get_partition :: (status: *mpd_status) -> *u8 #foreign libmpdclient;
+status_get_partition :: (_status: *status) -> *u8 #foreign libmpdclient "mpd_status_get_partition";
 
 /**
 * Returns the error message
 */
-mpd_status_get_error :: (status: *mpd_status) -> *u8 #foreign libmpdclient;
+status_get_error :: (_status: *status) -> *u8 #foreign libmpdclient "mpd_status_get_error";
 
 /**
 * Fetches the currently selected song (the song referenced by
@@ -2210,7 +2210,7 @@ mpd_status_get_error :: (status: *mpd_status) -> *u8 #foreign libmpdclient;
 * @param connection the connection to MPD
 * @return true on success, false on error
 */
-mpd_send_current_song :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_current_song :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_current_song";
 
 /**
 * Shortcut for mpd_send_current_song() and mpd_recv_song().
@@ -2219,7 +2219,7 @@ mpd_send_current_song :: (connection: *mpd_connection) -> bool #foreign libmpdcl
 * @return the current song, or NULL on error or if there is no
 * current song
 */
-mpd_run_current_song :: (connection: *mpd_connection) -> *mpd_song #foreign libmpdclient;
+run_current_song :: (_connection: *connection) -> *song #foreign libmpdclient "mpd_run_current_song";
 
 /**
 * Starts playing the current song from the beginning.
@@ -2227,7 +2227,7 @@ mpd_run_current_song :: (connection: *mpd_connection) -> *mpd_song #foreign libm
 * @param connection the connection to MPD
 * @return true on success, false on error
 */
-mpd_send_play :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_play :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_play";
 
 /**
 * Shortcut for mpd_send_play() and mpd_response_finish().
@@ -2235,7 +2235,7 @@ mpd_send_play :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
 * @param connection the connection to MPD
 * @return true on success, false on error
 */
-mpd_run_play :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+run_play :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_run_play";
 
 /**
 * Starts playing the specified song from the beginning.
@@ -2244,7 +2244,7 @@ mpd_run_play :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
 * @param song_pos the position of the song in the queue
 * @return true on success, false on error
 */
-mpd_send_play_pos :: (connection: *mpd_connection, song_pos: u32) -> bool #foreign libmpdclient;
+send_play_pos :: (_connection: *connection, song_pos: u32) -> bool #foreign libmpdclient "mpd_send_play_pos";
 
 /**
 * Shortcut for mpd_send_play() and mpd_response_finish().
@@ -2253,7 +2253,7 @@ mpd_send_play_pos :: (connection: *mpd_connection, song_pos: u32) -> bool #forei
 * @param song_pos the position of the song in the queue
 * @return true on success, false on error
 */
-mpd_run_play_pos :: (connection: *mpd_connection, song_pos: u32) -> bool #foreign libmpdclient;
+run_play_pos :: (_connection: *connection, song_pos: u32) -> bool #foreign libmpdclient "mpd_run_play_pos";
 
 /**
 * Starts playing the specified song from the beginning.
@@ -2262,7 +2262,7 @@ mpd_run_play_pos :: (connection: *mpd_connection, song_pos: u32) -> bool #foreig
 * @param song_id the id of the song
 * @return true on success, false on error
 */
-mpd_send_play_id :: (connection: *mpd_connection, song_id: u32) -> bool #foreign libmpdclient;
+send_play_id :: (_connection: *connection, song_id: u32) -> bool #foreign libmpdclient "mpd_send_play_id";
 
 /**
 * Shortcut for mpd_send_play_id() and mpd_response_finish().
@@ -2271,7 +2271,7 @@ mpd_send_play_id :: (connection: *mpd_connection, song_id: u32) -> bool #foreign
 * @param song_id the id of the song
 * @return true on success, false on error
 */
-mpd_run_play_id :: (connection: *mpd_connection, song_id: u32) -> bool #foreign libmpdclient;
+run_play_id :: (_connection: *connection, song_id: u32) -> bool #foreign libmpdclient "mpd_run_play_id";
 
 /**
 * Stops playing the current song.
@@ -2279,7 +2279,7 @@ mpd_run_play_id :: (connection: *mpd_connection, song_id: u32) -> bool #foreign 
 * @param connection the connection to MPD
 * @return true on success, false on error
 */
-mpd_send_stop :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_stop :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_stop";
 
 /**
 * Shortcut for mpd_send_stop() and mpd_response_finish().
@@ -2287,7 +2287,7 @@ mpd_send_stop :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
 * @param connection the connection to MPD
 * @return true on success, false on error
 */
-mpd_run_stop :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+run_stop :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_run_stop";
 
 /**
 * This function uses a deprecated feature of MPD, you should avoid it.
@@ -2297,7 +2297,7 @@ mpd_run_stop :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
 * @param connection the connection to MPD
 * @return true on success, false on error
 */
-mpd_send_toggle_pause :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_toggle_pause :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_toggle_pause";
 
 /**
 * This function uses a deprecated feature of MPD, you should avoid it.
@@ -2306,7 +2306,7 @@ mpd_send_toggle_pause :: (connection: *mpd_connection) -> bool #foreign libmpdcl
 * @param connection the connection to MPD
 * @return true on success, false on error
 */
-mpd_run_toggle_pause :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+run_toggle_pause :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_run_toggle_pause";
 
 /**
 * Pauses/Resumes playing the current song.
@@ -2316,7 +2316,7 @@ mpd_run_toggle_pause :: (connection: *mpd_connection) -> bool #foreign libmpdcli
 * @param mode if true: pause, if false: resume
 * @return true on success, false on error
 */
-mpd_send_pause :: (connection: *mpd_connection, mode: bool) -> bool #foreign libmpdclient;
+send_pause :: (_connection: *connection, mode: bool) -> bool #foreign libmpdclient "mpd_send_pause";
 
 /**
 * Shortcut for mpd_send_pause() and mpd_response_finish().
@@ -2325,7 +2325,7 @@ mpd_send_pause :: (connection: *mpd_connection, mode: bool) -> bool #foreign lib
 * @param mode if true: pause, if false: resume
 * @return true on success, false on error
 */
-mpd_run_pause :: (connection: *mpd_connection, mode: bool) -> bool #foreign libmpdclient;
+run_pause :: (_connection: *connection, mode: bool) -> bool #foreign libmpdclient "mpd_run_pause";
 
 /**
 * Play the next song in the playlist.
@@ -2333,7 +2333,7 @@ mpd_run_pause :: (connection: *mpd_connection, mode: bool) -> bool #foreign libm
 * @param connection the connection to MPD
 * @return true on success, false on error
 */
-mpd_send_next :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_next :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_next";
 
 /**
 * Shortcut for mpd_send_next() and mpd_response_finish().
@@ -2341,7 +2341,7 @@ mpd_send_next :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
 * @param connection the connection to MPD
 * @return true on success, false on error
 */
-mpd_run_next :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+run_next :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_run_next";
 
 /**
 * Play the previous song in the playlist.
@@ -2349,7 +2349,7 @@ mpd_run_next :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
 * @param connection the connection to MPD
 * @return true on success, false on error
 */
-mpd_send_previous :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_previous :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_previous";
 
 /**
 * Shortcut for mpd_send_previous() and mpd_response_finish().
@@ -2357,7 +2357,7 @@ mpd_send_previous :: (connection: *mpd_connection) -> bool #foreign libmpdclient
 * @param connection the connection to MPD
 * @return true on success, false on error
 */
-mpd_run_previous :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+run_previous :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_run_previous";
 
 /**
 * Seeks to the position t (in seconds) of position song_pos in the playlist.
@@ -2367,7 +2367,7 @@ mpd_run_previous :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
 * @param t the position within the song, in seconds
 * @return true on success, false on error
 */
-mpd_send_seek_pos :: (connection: *mpd_connection, song_pos: u32, t: u32) -> bool #foreign libmpdclient;
+send_seek_pos :: (_connection: *connection, song_pos: u32, t: u32) -> bool #foreign libmpdclient "mpd_send_seek_pos";
 
 /**
 * Shortcut for mpd_send_seek_pos() and mpd_response_finish().
@@ -2377,7 +2377,7 @@ mpd_send_seek_pos :: (connection: *mpd_connection, song_pos: u32, t: u32) -> boo
 * @param t the position within the song, in seconds
 * @return true on success, false on error
 */
-mpd_run_seek_pos :: (connection: *mpd_connection, song_pos: u32, t: u32) -> bool #foreign libmpdclient;
+run_seek_pos :: (_connection: *connection, song_pos: u32, t: u32) -> bool #foreign libmpdclient "mpd_run_seek_pos";
 
 /**
 * Seeks to the position t (in seconds) of song id song_id.
@@ -2387,7 +2387,7 @@ mpd_run_seek_pos :: (connection: *mpd_connection, song_pos: u32, t: u32) -> bool
 * @param t the position within the song, in seconds
 * @return true on success, false on error
 */
-mpd_send_seek_id :: (connection: *mpd_connection, song_id: u32, t: u32) -> bool #foreign libmpdclient;
+send_seek_id :: (_connection: *connection, song_id: u32, t: u32) -> bool #foreign libmpdclient "mpd_send_seek_id";
 
 /**
 * Shortcut for mpd_send_seek_id() and mpd_response_finish().
@@ -2397,7 +2397,7 @@ mpd_send_seek_id :: (connection: *mpd_connection, song_id: u32, t: u32) -> bool 
 * @param t the position within the song, in seconds
 * @return true on success, false on error
 */
-mpd_run_seek_id :: (connection: *mpd_connection, song_id: u32, t: u32) -> bool #foreign libmpdclient;
+run_seek_id :: (_connection: *connection, song_id: u32, t: u32) -> bool #foreign libmpdclient "mpd_run_seek_id";
 
 /**
 * Seeks to the position t (in seconds; fractions allowed) of song id song_id.
@@ -2407,7 +2407,7 @@ mpd_run_seek_id :: (connection: *mpd_connection, song_id: u32, t: u32) -> bool #
 * @param t the position within the song, in seconds (fractions allowed)
 * @return true on success, false on error
 */
-mpd_send_seek_id_float :: (connection: *mpd_connection, song_id: u32, t: float) -> bool #foreign libmpdclient;
+send_seek_id_float :: (_connection: *connection, song_id: u32, t: float) -> bool #foreign libmpdclient "mpd_send_seek_id_float";
 
 /**
 * Shortcut for mpd_send_seek_id_float() and mpd_response_finish().
@@ -2417,7 +2417,7 @@ mpd_send_seek_id_float :: (connection: *mpd_connection, song_id: u32, t: float) 
 * @param t the position within the song, in seconds (fractions allowed)
 * @return true on success, false on error
 */
-mpd_run_seek_id_float :: (connection: *mpd_connection, song_id: u32, t: float) -> bool #foreign libmpdclient;
+run_seek_id_float :: (_connection: *connection, song_id: u32, t: float) -> bool #foreign libmpdclient "mpd_run_seek_id_float";
 
 /**
 * Seeks the current song.
@@ -2429,7 +2429,7 @@ mpd_run_seek_id_float :: (connection: *mpd_connection, song_id: u32, t: float) -
 *
 * @since MPD 0.17, libmpdclient 2.15
 */
-mpd_send_seek_current :: (connection: *mpd_connection, t: float, relative: bool) -> bool #foreign libmpdclient;
+send_seek_current :: (_connection: *connection, t: float, relative: bool) -> bool #foreign libmpdclient "mpd_send_seek_current";
 
 /**
 * Shortcut for mpd_send_seek_current() and mpd_response_finish().
@@ -2442,7 +2442,7 @@ mpd_send_seek_current :: (connection: *mpd_connection, t: float, relative: bool)
 *
 * @since MPD 0.17, libmpdclient 2.15
 */
-mpd_run_seek_current :: (connection: *mpd_connection, t: float, relative: bool) -> bool #foreign libmpdclient;
+run_seek_current :: (_connection: *connection, t: float, relative: bool) -> bool #foreign libmpdclient "mpd_run_seek_current";
 
 /**
 * Sets repeat on/off for the current song.
@@ -2453,7 +2453,7 @@ mpd_run_seek_current :: (connection: *mpd_connection, t: float, relative: bool) 
 * @param mode if true: repeat, if false: do not repeat
 * @return true on success, false on error
 */
-mpd_send_repeat :: (connection: *mpd_connection, mode: bool) -> bool #foreign libmpdclient;
+send_repeat :: (_connection: *connection, mode: bool) -> bool #foreign libmpdclient "mpd_send_repeat";
 
 /**
 * Shortcut for mpd_send_repeat() and mpd_response_finish().
@@ -2462,7 +2462,7 @@ mpd_send_repeat :: (connection: *mpd_connection, mode: bool) -> bool #foreign li
 * @param mode if true: pause, if false: resume
 * @return true on success, false on error
 */
-mpd_run_repeat :: (connection: *mpd_connection, mode: bool) -> bool #foreign libmpdclient;
+run_repeat :: (_connection: *connection, mode: bool) -> bool #foreign libmpdclient "mpd_run_repeat";
 
 /**
 * Sets random mode on/off for the queue.
@@ -2473,7 +2473,7 @@ mpd_run_repeat :: (connection: *mpd_connection, mode: bool) -> bool #foreign lib
 * @param mode if true: enable random mode, if false: disable random mode
 * @return true on success, false on error
 */
-mpd_send_random :: (connection: *mpd_connection, mode: bool) -> bool #foreign libmpdclient;
+send_random :: (_connection: *connection, mode: bool) -> bool #foreign libmpdclient "mpd_send_random";
 
 /**
 * Shortcut for mpd_send_random() and mpd_response_finish().
@@ -2482,7 +2482,7 @@ mpd_send_random :: (connection: *mpd_connection, mode: bool) -> bool #foreign li
 * @param mode if true: enable random mode, if false: disable random mode
 * @return true on success, false on error
 */
-mpd_run_random :: (connection: *mpd_connection, mode: bool) -> bool #foreign libmpdclient;
+run_random :: (_connection: *connection, mode: bool) -> bool #foreign libmpdclient "mpd_run_random";
 
 /**
 * Sets single state for the playlist.
@@ -2502,7 +2502,7 @@ mpd_run_random :: (connection: *mpd_connection, mode: bool) -> bool #foreign lib
 *
 * @since MPD 0.21, libmpdclient 2.18.
 */
-mpd_send_single_state :: (connection: *mpd_connection, state: mpd_single_state) -> bool #foreign libmpdclient;
+send_single_state :: (_connection: *connection, _state: single_state) -> bool #foreign libmpdclient "mpd_send_single_state";
 
 /**
 * Shortcut for mpd_send_single_state() and mpd_response_finish().
@@ -2513,7 +2513,7 @@ mpd_send_single_state :: (connection: *mpd_connection, state: mpd_single_state) 
 *
 * @since MPD 0.21, libmpdclient 2.18.
 */
-mpd_run_single_state :: (connection: *mpd_connection, state: mpd_single_state) -> bool #foreign libmpdclient;
+run_single_state :: (_connection: *connection, _state: single_state) -> bool #foreign libmpdclient "mpd_run_single_state";
 
 /**
 * Sets single mode on/off for the playlist.
@@ -2532,7 +2532,7 @@ mpd_run_single_state :: (connection: *mpd_connection, state: mpd_single_state) -
 *
 * @since MPD 0.15
 */
-mpd_send_single :: (connection: *mpd_connection, mode: bool) -> bool #foreign libmpdclient;
+send_single :: (_connection: *connection, mode: bool) -> bool #foreign libmpdclient "mpd_send_single";
 
 /**
 * Shortcut for mpd_send_single() and mpd_response_finish().
@@ -2543,7 +2543,7 @@ mpd_send_single :: (connection: *mpd_connection, mode: bool) -> bool #foreign li
 *
 * @since MPD 0.15
 */
-mpd_run_single :: (connection: *mpd_connection, mode: bool) -> bool #foreign libmpdclient;
+run_single :: (_connection: *connection, mode: bool) -> bool #foreign libmpdclient "mpd_run_single";
 
 /**
 * Sets consume mode on/off for the playlist.
@@ -2558,7 +2558,7 @@ mpd_run_single :: (connection: *mpd_connection, mode: bool) -> bool #foreign lib
 *
 * @since MPD 0.15
 */
-mpd_send_consume :: (connection: *mpd_connection, mode: bool) -> bool #foreign libmpdclient;
+send_consume :: (_connection: *connection, mode: bool) -> bool #foreign libmpdclient "mpd_send_consume";
 
 /**
 * Shortcut for mpd_send_consume() and mpd_response_finish().
@@ -2569,7 +2569,7 @@ mpd_send_consume :: (connection: *mpd_connection, mode: bool) -> bool #foreign l
 *
 * @since MPD 0.15
 */
-mpd_run_consume :: (connection: *mpd_connection, mode: bool) -> bool #foreign libmpdclient;
+run_consume :: (_connection: *connection, mode: bool) -> bool #foreign libmpdclient "mpd_run_consume";
 
 /**
 * Sets crossfading of seconds between songs on for the playlist.
@@ -2579,7 +2579,7 @@ mpd_run_consume :: (connection: *mpd_connection, mode: bool) -> bool #foreign li
 * @param seconds seconds of crossfading between songs
 * @return true on success, false on error
 */
-mpd_send_crossfade :: (connection: *mpd_connection, seconds: u32) -> bool #foreign libmpdclient;
+send_crossfade :: (_connection: *connection, seconds: u32) -> bool #foreign libmpdclient "mpd_send_crossfade";
 
 /**
 * Shortcut for mpd_send_crossfade() and mpd_response_finish().
@@ -2588,7 +2588,7 @@ mpd_send_crossfade :: (connection: *mpd_connection, seconds: u32) -> bool #forei
 * @param seconds seconds of crossfading between songs
 * @return true on success, false on error
 */
-mpd_run_crossfade :: (connection: *mpd_connection, seconds: u32) -> bool #foreign libmpdclient;
+run_crossfade :: (_connection: *connection, seconds: u32) -> bool #foreign libmpdclient "mpd_run_crossfade";
 
 /**
 * Sets the threshold at which songs will be overlapped. Like crossfading but
@@ -2604,7 +2604,7 @@ mpd_run_crossfade :: (connection: *mpd_connection, seconds: u32) -> bool #foreig
 *
 * @since libmpdclient 2.2
 */
-mpd_send_mixrampdb :: (connection: *mpd_connection, db: float) -> bool #foreign libmpdclient;
+send_mixrampdb :: (_connection: *connection, db: float) -> bool #foreign libmpdclient "mpd_send_mixrampdb";
 
 /**
 * Shortcut for mpd_send_mixrampdb() and mpd_response_finish().
@@ -2615,7 +2615,7 @@ mpd_send_mixrampdb :: (connection: *mpd_connection, db: float) -> bool #foreign 
 *
 * @since libmpdclient 2.2
 */
-mpd_run_mixrampdb :: (connection: *mpd_connection, db: float) -> bool #foreign libmpdclient;
+run_mixrampdb :: (_connection: *connection, db: float) -> bool #foreign libmpdclient "mpd_run_mixrampdb";
 
 /**
 * Sets additional time subtracted from the overlap calculated by mixrampdb.
@@ -2627,7 +2627,7 @@ mpd_run_mixrampdb :: (connection: *mpd_connection, db: float) -> bool #foreign l
 *
 * @since libmpdclient 2.2
 */
-mpd_send_mixrampdelay :: (connection: *mpd_connection, seconds: float) -> bool #foreign libmpdclient;
+send_mixrampdelay :: (_connection: *connection, seconds: float) -> bool #foreign libmpdclient "mpd_send_mixrampdelay";
 
 /**
 * Shortcut for mpd_send_mixrampdelay() and mpd_response_finish().
@@ -2638,7 +2638,7 @@ mpd_send_mixrampdelay :: (connection: *mpd_connection, seconds: float) -> bool #
 *
 * @since libmpdclient 2.2
 */
-mpd_run_mixrampdelay :: (connection: *mpd_connection, seconds: float) -> bool #foreign libmpdclient;
+run_mixrampdelay :: (_connection: *connection, seconds: float) -> bool #foreign libmpdclient "mpd_run_mixrampdelay";
 
 /**
 * Clears the current error message in MPD's status (this is also accomplished
@@ -2649,7 +2649,7 @@ mpd_run_mixrampdelay :: (connection: *mpd_connection, seconds: float) -> bool #f
 *
 * @since libmpdclient 2.4
 */
-mpd_send_clearerror :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_clearerror :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_clearerror";
 
 /**
 * Shortcut for mpd_send_clearerror() and mpd_response_finish().
@@ -2659,9 +2659,9 @@ mpd_send_clearerror :: (connection: *mpd_connection) -> bool #foreign libmpdclie
 *
 * @since libmpdclient 2.4
 */
-mpd_run_clearerror :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+run_clearerror :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_run_clearerror";
 
-mpd_position_whence :: enum u32 {
+position_whence :: enum u32 {
     ABSOLUTE       :: 0;
     AFTER_CURRENT  :: 1;
     BEFORE_CURRENT :: 2;
@@ -2672,31 +2672,31 @@ mpd_position_whence :: enum u32 {
 *
 * @return the charater, or "" if the whence position is absolute or not valid.
 */
-mpd_position_whence_char :: (whence: mpd_position_whence) -> *u8 #foreign libmpdclient;
+position_whence_char :: (whence: position_whence) -> *u8 #foreign libmpdclient "mpd_position_whence_char";
 
 /**
 * Free memory allocated by the #mpd_playlist object.
 */
-mpd_playlist_free :: (playlist: *mpd_playlist) -> void #foreign libmpdclient;
+playlist_free :: (_playlist: *playlist) -> void #foreign libmpdclient "mpd_playlist_free";
 
 /**
 * Duplicates a #mpd_playlist object.
 *
 * @return the new object, or NULL on out of memory
 */
-mpd_playlist_dup :: (playlist: *mpd_playlist) -> *mpd_playlist #foreign libmpdclient;
+playlist_dup :: (_playlist: *playlist) -> *playlist #foreign libmpdclient "mpd_playlist_dup";
 
 /**
 * Returns the path name of this playlist file.  It does not begin
 * with a slash.
 */
-mpd_playlist_get_path :: (playlist: *mpd_playlist) -> *u8 #foreign libmpdclient;
+playlist_get_path :: (_playlist: *playlist) -> *u8 #foreign libmpdclient "mpd_playlist_get_path";
 
 /**
 * @return the POSIX UTC time stamp of the last modification, or 0 if
 * that is unknown
 */
-mpd_playlist_get_last_modified :: (playlist: *mpd_playlist) -> time_t #foreign libmpdclient;
+playlist_get_last_modified :: (_playlist: *playlist) -> time_t #foreign libmpdclient "mpd_playlist_get_last_modified";
 
 /**
 * Begins parsing a new playlist.
@@ -2706,7 +2706,7 @@ mpd_playlist_get_last_modified :: (playlist: *mpd_playlist) -> time_t #foreign l
 * @return the new #mpd_playlist object, or NULL on error (out of
 * memory, or pair name is not "playlist")
 */
-mpd_playlist_begin :: (pair: *mpd_pair) -> *mpd_playlist #foreign libmpdclient;
+playlist_begin :: (_pair: *pair) -> *playlist #foreign libmpdclient "mpd_playlist_begin";
 
 /**
 * Parses the pair, adding its information to the specified
@@ -2716,7 +2716,7 @@ mpd_playlist_begin :: (pair: *mpd_pair) -> *mpd_playlist #foreign libmpdclient;
 * the pair was not understood and ignored), false if this pair is the
 * beginning of the next playlist
 */
-mpd_playlist_feed :: (playlist: *mpd_playlist, pair: *mpd_pair) -> bool #foreign libmpdclient;
+playlist_feed :: (_playlist: *playlist, _pair: *pair) -> bool #foreign libmpdclient "mpd_playlist_feed";
 
 /**
 * Obtain a list of stored playlists.
@@ -2727,7 +2727,7 @@ mpd_playlist_feed :: (playlist: *mpd_playlist, pair: *mpd_pair) -> bool #foreign
 *
 * @since libmpdclient 2.5
 */
-mpd_send_list_playlists :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_list_playlists :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_list_playlists";
 
 /**
 * Receives the next playlist from the MPD server.
@@ -2735,7 +2735,7 @@ mpd_send_list_playlists :: (connection: *mpd_connection) -> bool #foreign libmpd
 * @return a #mpd_playlist object, or NULL on error or if the playlist list is
 * finished
 */
-mpd_recv_playlist :: (connection: *mpd_connection) -> *mpd_playlist #foreign libmpdclient;
+recv_playlist :: (_connection: *connection) -> *playlist #foreign libmpdclient "mpd_recv_playlist";
 
 /**
 * List the content of the stored playlist identified by name.
@@ -2745,7 +2745,7 @@ mpd_recv_playlist :: (connection: *mpd_connection) -> *mpd_playlist #foreign lib
 * @param name the name of the playlist
 * @return true on success, false on error
 */
-mpd_send_list_playlist :: (connection: *mpd_connection, name: *u8) -> bool #foreign libmpdclient;
+send_list_playlist :: (_connection: *connection, name: *u8) -> bool #foreign libmpdclient "mpd_send_list_playlist";
 
 /**
 * List the content, with full metadata, of the stored playlist identified by
@@ -2755,7 +2755,7 @@ mpd_send_list_playlist :: (connection: *mpd_connection, name: *u8) -> bool #fore
 * @param name the name of the playlist
 * @return true on success, false on error
 */
-mpd_send_list_playlist_meta :: (connection: *mpd_connection, name: *u8) -> bool #foreign libmpdclient;
+send_list_playlist_meta :: (_connection: *connection, name: *u8) -> bool #foreign libmpdclient "mpd_send_list_playlist_meta";
 
 /**
 * Clear the playlist name (i.e. truncate name.m3u)
@@ -2764,7 +2764,7 @@ mpd_send_list_playlist_meta :: (connection: *mpd_connection, name: *u8) -> bool 
 * @param name the name of the playlist
 * @return true on success, false on error
 */
-mpd_send_playlist_clear :: (connection: *mpd_connection, name: *u8) -> bool #foreign libmpdclient;
+send_playlist_clear :: (_connection: *connection, name: *u8) -> bool #foreign libmpdclient "mpd_send_playlist_clear";
 
 /**
 * Shortcut for mpd_send_playlist_clear() and mpd_response_finish().
@@ -2773,7 +2773,7 @@ mpd_send_playlist_clear :: (connection: *mpd_connection, name: *u8) -> bool #for
 * @param name the name of the playlist
 * @return true on success, false on error
 */
-mpd_run_playlist_clear :: (connection: *mpd_connection, name: *u8) -> bool #foreign libmpdclient;
+run_playlist_clear :: (_connection: *connection, name: *u8) -> bool #foreign libmpdclient "mpd_run_playlist_clear";
 
 /**
 * Add a path to a playlist. The playlist will be created if it does not
@@ -2784,7 +2784,7 @@ mpd_run_playlist_clear :: (connection: *mpd_connection, name: *u8) -> bool #fore
 * @param path URI to be added
 * @return true on success, false on error
 */
-mpd_send_playlist_add :: (connection: *mpd_connection, name: *u8, path: *u8) -> bool #foreign libmpdclient;
+send_playlist_add :: (_connection: *connection, name: *u8, path: *u8) -> bool #foreign libmpdclient "mpd_send_playlist_add";
 
 /**
 * Shortcut for mpd_send_playlist_add() and mpd_response_finish().
@@ -2794,7 +2794,7 @@ mpd_send_playlist_add :: (connection: *mpd_connection, name: *u8, path: *u8) -> 
 * @param path URI to be added
 * @return true on success, false on error
 */
-mpd_run_playlist_add :: (connection: *mpd_connection, name: *u8, path: *u8) -> bool #foreign libmpdclient;
+run_playlist_add :: (_connection: *connection, name: *u8, path: *u8) -> bool #foreign libmpdclient "mpd_run_playlist_add";
 
 /**
 * Inserts a uri to a playlist for a given position. The playlist 
@@ -2808,7 +2808,7 @@ mpd_run_playlist_add :: (connection: *mpd_connection, name: *u8, path: *u8) -> b
 *
 * @since libmpdclient 2.20
 */
-mpd_send_playlist_add_to :: (connection: *mpd_connection, name: *u8, uri: *u8, to: u32) -> bool #foreign libmpdclient;
+send_playlist_add_to :: (_connection: *connection, name: *u8, uri: *u8, to: u32) -> bool #foreign libmpdclient "mpd_send_playlist_add_to";
 
 /**
 * Shortcut for mpd_send_playlist_add_to() and mpd_response_finish().
@@ -2821,7 +2821,7 @@ mpd_send_playlist_add_to :: (connection: *mpd_connection, name: *u8, uri: *u8, t
 *
 * @since libmpdclient 2.20
 */
-mpd_run_playlist_add_to :: (connection: *mpd_connection, name: *u8, uri: *u8, to: u32) -> bool #foreign libmpdclient;
+run_playlist_add_to :: (_connection: *connection, name: *u8, uri: *u8, to: u32) -> bool #foreign libmpdclient "mpd_run_playlist_add_to";
 
 /**
 * Move a song from one position to another in the same playlist.
@@ -2832,7 +2832,7 @@ mpd_run_playlist_add_to :: (connection: *mpd_connection, name: *u8, uri: *u8, to
 * @param to next song position in the playlist
 * @return true on success, false on error
 */
-mpd_send_playlist_move :: (connection: *mpd_connection, name: *u8, from: u32, to: u32) -> bool #foreign libmpdclient;
+send_playlist_move :: (_connection: *connection, name: *u8, from: u32, to: u32) -> bool #foreign libmpdclient "mpd_send_playlist_move";
 
 /**
 * Shortcut for mpd_send_playlist_move() and mpd_response_finish().
@@ -2845,7 +2845,7 @@ mpd_send_playlist_move :: (connection: *mpd_connection, name: *u8, from: u32, to
 *
 * @since libmpdclient 2.19
 */
-mpd_run_playlist_move :: (connection: *mpd_connection, name: *u8, from: u32, to: u32) -> bool #foreign libmpdclient;
+run_playlist_move :: (_connection: *connection, name: *u8, from: u32, to: u32) -> bool #foreign libmpdclient "mpd_run_playlist_move";
 
 /**
 * Delete a position from a playlist.
@@ -2855,7 +2855,7 @@ mpd_run_playlist_move :: (connection: *mpd_connection, name: *u8, from: u32, to:
 * @param pos song position in the playlist
 * @return true on success, false on error
 */
-mpd_send_playlist_delete :: (connection: *mpd_connection, name: *u8, pos: u32) -> bool #foreign libmpdclient;
+send_playlist_delete :: (_connection: *connection, name: *u8, pos: u32) -> bool #foreign libmpdclient "mpd_send_playlist_delete";
 
 /**
 * Shortcut for mpd_send_playlist_delete() and mpd_response_finish().
@@ -2865,7 +2865,7 @@ mpd_send_playlist_delete :: (connection: *mpd_connection, name: *u8, pos: u32) -
 * @param pos song position in the playlist
 * @return true on success, false on error
 */
-mpd_run_playlist_delete :: (connection: *mpd_connection, name: *u8, pos: u32) -> bool #foreign libmpdclient;
+run_playlist_delete :: (_connection: *connection, name: *u8, pos: u32) -> bool #foreign libmpdclient "mpd_run_playlist_delete";
 
 /**
 * Delete a range from a playlist.
@@ -2878,7 +2878,7 @@ mpd_run_playlist_delete :: (connection: *mpd_connection, name: *u8, pos: u32) ->
 *
 * @since libmpdclient 2.20
 */
-mpd_send_playlist_delete_range :: (connection: *mpd_connection, name: *u8, start: u32, end: u32) -> bool #foreign libmpdclient;
+send_playlist_delete_range :: (_connection: *connection, name: *u8, start: u32, end: u32) -> bool #foreign libmpdclient "mpd_send_playlist_delete_range";
 
 /**
 * Shortcut for mpd_send_playlist_delete_range() and mpd_response_finish().
@@ -2891,7 +2891,7 @@ mpd_send_playlist_delete_range :: (connection: *mpd_connection, name: *u8, start
 *
 * @since libmpdclient 2.20
 */
-mpd_run_playlist_delete_range :: (connection: *mpd_connection, name: *u8, start: u32, end: u32) -> bool #foreign libmpdclient;
+run_playlist_delete_range :: (_connection: *connection, name: *u8, start: u32, end: u32) -> bool #foreign libmpdclient "mpd_run_playlist_delete_range";
 
 /**
 * Saves the current queue as a m3u file in the playlist directory
@@ -2901,7 +2901,7 @@ mpd_run_playlist_delete_range :: (connection: *mpd_connection, name: *u8, start:
 * @param name the name of the playlist file
 * @return true on success, false on error
 */
-mpd_send_save :: (connection: *mpd_connection, name: *u8) -> bool #foreign libmpdclient;
+send_save :: (_connection: *connection, name: *u8) -> bool #foreign libmpdclient "mpd_send_save";
 
 /**
 * Shortcut for mpd_send_save() and mpd_response_finish().
@@ -2910,7 +2910,7 @@ mpd_send_save :: (connection: *mpd_connection, name: *u8) -> bool #foreign libmp
 * @param name the name of the playlist file
 * @return true on success, false on error
 */
-mpd_run_save :: (connection: *mpd_connection, name: *u8) -> bool #foreign libmpdclient;
+run_save :: (_connection: *connection, name: *u8) -> bool #foreign libmpdclient "mpd_run_save";
 
 /**
 * Load a stored playlist into the queue.
@@ -2921,7 +2921,7 @@ mpd_run_save :: (connection: *mpd_connection, name: *u8) -> bool #foreign libmpd
 *
 * @since libmpdclient 2.0
 */
-mpd_send_load :: (connection: *mpd_connection, name: *u8) -> bool #foreign libmpdclient;
+send_load :: (_connection: *connection, name: *u8) -> bool #foreign libmpdclient "mpd_send_load";
 
 /**
 * Shortcut for mpd_send_load() and mpd_response_finish().
@@ -2932,7 +2932,7 @@ mpd_send_load :: (connection: *mpd_connection, name: *u8) -> bool #foreign libmp
 *
 * @since libmpdclient 2.0
 */
-mpd_run_load :: (connection: *mpd_connection, name: *u8) -> bool #foreign libmpdclient;
+run_load :: (_connection: *connection, name: *u8) -> bool #foreign libmpdclient "mpd_run_load";
 
 /**
 * Like mpd_send_load(), but load only a portion of the playlist.
@@ -2946,7 +2946,7 @@ mpd_run_load :: (connection: *mpd_connection, name: *u8) -> bool #foreign libmpd
 *
 * @since libmpdclient 2.16
 */
-mpd_send_load_range :: (connection: *mpd_connection, name: *u8, start: u32, end: u32) -> bool #foreign libmpdclient;
+send_load_range :: (_connection: *connection, name: *u8, start: u32, end: u32) -> bool #foreign libmpdclient "mpd_send_load_range";
 
 /**
 * Shortcut for mpd_send_load_range() and mpd_response_finish().
@@ -2960,7 +2960,7 @@ mpd_send_load_range :: (connection: *mpd_connection, name: *u8, start: u32, end:
 *
 * @since libmpdclient 2.16
 */
-mpd_run_load_range :: (connection: *mpd_connection, name: *u8, start: u32, end: u32) -> bool #foreign libmpdclient;
+run_load_range :: (_connection: *connection, name: *u8, start: u32, end: u32) -> bool #foreign libmpdclient "mpd_run_load_range";
 
 /**
 * Like mpd_send_load() or mpd_send_load_range(), but with range 
@@ -2977,7 +2977,7 @@ mpd_run_load_range :: (connection: *mpd_connection, name: *u8, start: u32, end: 
 *
 * @since libmpdclient 2.20
 */
-mpd_send_load_range_to :: (connection: *mpd_connection, name: *u8, start: u32, end: u32, to: u32, whence: mpd_position_whence) -> bool #foreign libmpdclient;
+send_load_range_to :: (_connection: *connection, name: *u8, start: u32, end: u32, to: u32, whence: position_whence) -> bool #foreign libmpdclient "mpd_send_load_range_to";
 
 /**
 * Shortcut for mpd_send_load_range_to() and mpd_response_finish().
@@ -2993,7 +2993,7 @@ mpd_send_load_range_to :: (connection: *mpd_connection, name: *u8, start: u32, e
 *
 * @since libmpdclient 2.20
 */
-mpd_run_load_range_to :: (connection: *mpd_connection, name: *u8, start: u32, end: u32, to: u32, whence: mpd_position_whence) -> bool #foreign libmpdclient;
+run_load_range_to :: (_connection: *connection, name: *u8, start: u32, end: u32, to: u32, whence: position_whence) -> bool #foreign libmpdclient "mpd_run_load_range_to";
 
 /**
 * Rename a playlist in the playlist directory.
@@ -3003,7 +3003,7 @@ mpd_run_load_range_to :: (connection: *mpd_connection, name: *u8, start: u32, en
 * @param to the next name of the playlist file
 * @return true on success, false on error
 */
-mpd_send_rename :: (connection: *mpd_connection, from: *u8, to: *u8) -> bool #foreign libmpdclient;
+send_rename :: (_connection: *connection, from: *u8, to: *u8) -> bool #foreign libmpdclient "mpd_send_rename";
 
 /**
 * Shortcut for mpd_send_rename() and mpd_response_finish().
@@ -3013,7 +3013,7 @@ mpd_send_rename :: (connection: *mpd_connection, from: *u8, to: *u8) -> bool #fo
 * @param to the next name of the playlist file
 * @return true on success, false on error
 */
-mpd_run_rename :: (connection: *mpd_connection, from: *u8, to: *u8) -> bool #foreign libmpdclient;
+run_rename :: (_connection: *connection, from: *u8, to: *u8) -> bool #foreign libmpdclient "mpd_run_rename";
 
 /**
 * Remove a playlist from the playlist directory.
@@ -3022,7 +3022,7 @@ mpd_run_rename :: (connection: *mpd_connection, from: *u8, to: *u8) -> bool #for
 * @param name the name of the playlist file
 * @return true on success, false on error
 */
-mpd_send_rm :: (connection: *mpd_connection, name: *u8) -> bool #foreign libmpdclient;
+send_rm :: (_connection: *connection, name: *u8) -> bool #foreign libmpdclient "mpd_send_rm";
 
 /**
 * Shortcut for mpd_send_rm() and mpd_response_finish().
@@ -3031,7 +3031,7 @@ mpd_send_rm :: (connection: *mpd_connection, name: *u8) -> bool #foreign libmpdc
 * @param name the name of the playlist file
 * @return true on success, false on error
 */
-mpd_run_rm :: (connection: *mpd_connection, name: *u8) -> bool #foreign libmpdclient;
+run_rm :: (_connection: *connection, name: *u8) -> bool #foreign libmpdclient "mpd_run_rm";
 
 /**
 * Sends the "playlistinfo" command: list all songs in the queue
@@ -3041,7 +3041,7 @@ mpd_run_rm :: (connection: *mpd_connection, name: *u8) -> bool #foreign libmpdcl
 * @param connection the connection to MPD
 * @return true on success, false on error
 */
-mpd_send_list_queue_meta :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_list_queue_meta :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_list_queue_meta";
 
 /**
 * Like mpd_send_list_queue_meta(), but specifies a (position) range.
@@ -3055,7 +3055,7 @@ mpd_send_list_queue_meta :: (connection: *mpd_connection) -> bool #foreign libmp
 *
 * @since libmpdclient 2.8 added support for "UINT_MAX"
 */
-mpd_send_list_queue_range_meta :: (connection: *mpd_connection, start: u32, end: u32) -> bool #foreign libmpdclient;
+send_list_queue_range_meta :: (_connection: *connection, start: u32, end: u32) -> bool #foreign libmpdclient "mpd_send_list_queue_range_meta";
 
 /**
 * Requests information (including tags) about one song in the
@@ -3065,7 +3065,7 @@ mpd_send_list_queue_range_meta :: (connection: *mpd_connection, start: u32, end:
 * @param connection the connection to MPD
 * @param pos the position of the requested song
 */
-mpd_send_get_queue_song_pos :: (connection: *mpd_connection, pos: u32) -> bool #foreign libmpdclient;
+send_get_queue_song_pos :: (_connection: *connection, pos: u32) -> bool #foreign libmpdclient "mpd_send_get_queue_song_pos";
 
 /**
 * Shortcut for mpd_send_get_queue_song_pos() and mpd_recv_song().
@@ -3074,7 +3074,7 @@ mpd_send_get_queue_song_pos :: (connection: *mpd_connection, pos: u32) -> bool #
 * @param pos the position of the requested song
 * @return the song at the specified position, or NULL on error
 */
-mpd_run_get_queue_song_pos :: (connection: *mpd_connection, pos: u32) -> *mpd_song #foreign libmpdclient;
+run_get_queue_song_pos :: (_connection: *connection, pos: u32) -> *song #foreign libmpdclient "mpd_run_get_queue_song_pos";
 
 /**
 * Requests information (including tags) about one song in the
@@ -3084,7 +3084,7 @@ mpd_run_get_queue_song_pos :: (connection: *mpd_connection, pos: u32) -> *mpd_so
 * @param connection the connection to MPD
 * @param id the id of the requested song
 */
-mpd_send_get_queue_song_id :: (connection: *mpd_connection, id: u32) -> bool #foreign libmpdclient;
+send_get_queue_song_id :: (_connection: *connection, id: u32) -> bool #foreign libmpdclient "mpd_send_get_queue_song_id";
 
 /**
 * Shortcut for mpd_send_get_queue_song_id() and mpd_recv_song().
@@ -3093,7 +3093,7 @@ mpd_send_get_queue_song_id :: (connection: *mpd_connection, id: u32) -> bool #fo
 * @param id the id of the requested song
 * @return the song at the specified id, or NULL on error
 */
-mpd_run_get_queue_song_id :: (connection: *mpd_connection, id: u32) -> *mpd_song #foreign libmpdclient;
+run_get_queue_song_id :: (_connection: *connection, id: u32) -> *song #foreign libmpdclient "mpd_run_get_queue_song_id";
 
 /**
 * Request the queue changes from MPD since the specified version,
@@ -3106,7 +3106,7 @@ mpd_run_get_queue_song_id :: (connection: *mpd_connection, id: u32) -> *mpd_song
 * @param version The playlist version you want the diff with.
 * @return true on success, false on error
 */
-mpd_send_queue_changes_meta :: (connection: *mpd_connection, version: u32) -> bool #foreign libmpdclient;
+send_queue_changes_meta :: (_connection: *connection, version: u32) -> bool #foreign libmpdclient "mpd_send_queue_changes_meta";
 
 /**
 * Same as mpd_send_queue_changes_meta(), but limit the result to a
@@ -3124,7 +3124,7 @@ mpd_send_queue_changes_meta :: (connection: *mpd_connection, version: u32) -> bo
 *
 * @since libmpdclient 2.12
 */
-mpd_send_queue_changes_meta_range :: (connection: *mpd_connection, version: u32, start: u32, end: u32) -> bool #foreign libmpdclient;
+send_queue_changes_meta_range :: (_connection: *connection, version: u32, start: u32, end: u32) -> bool #foreign libmpdclient "mpd_send_queue_changes_meta_range";
 
 /**
 * A more bandwidth efficient version of the
@@ -3137,7 +3137,7 @@ mpd_send_queue_changes_meta_range :: (connection: *mpd_connection, version: u32,
 * @param version The playlist version you want the diff with.
 * @return true on success, false on error
 */
-mpd_send_queue_changes_brief :: (connection: *mpd_connection, version: u32) -> bool #foreign libmpdclient;
+send_queue_changes_brief :: (_connection: *connection, version: u32) -> bool #foreign libmpdclient "mpd_send_queue_changes_brief";
 
 /**
 * Same as mpd_send_queue_changes_brief(), but limit the result to a
@@ -3154,7 +3154,7 @@ mpd_send_queue_changes_brief :: (connection: *mpd_connection, version: u32) -> b
 *
 * @since libmpdclient 2.12
 */
-mpd_send_queue_changes_brief_range :: (connection: *mpd_connection, version: u32, start: u32, end: u32) -> bool #foreign libmpdclient;
+send_queue_changes_brief_range :: (_connection: *connection, version: u32, start: u32, end: u32) -> bool #foreign libmpdclient "mpd_send_queue_changes_brief_range";
 
 /**
 * Receives a response element of mpd_send_queue_changes_brief() or
@@ -3166,7 +3166,7 @@ mpd_send_queue_changes_brief_range :: (connection: *mpd_connection, version: u32
 * @return true on success, false on error or if there are no more
 * changes in this response
 */
-mpd_recv_queue_change_brief :: (connection: *mpd_connection, position_r: *u32, id_r: *u32) -> bool #foreign libmpdclient;
+recv_queue_change_brief :: (_connection: *connection, position_r: *u32, id_r: *u32) -> bool #foreign libmpdclient "mpd_recv_queue_change_brief";
 
 /**
 * Appends a song to the playlist: either a single file or a directory.
@@ -3175,7 +3175,7 @@ mpd_recv_queue_change_brief :: (connection: *mpd_connection, position_r: *u32, i
 * @param uri URI of a song or directory (added recursively)
 * @return true on success, false on error
 */
-mpd_send_add :: (connection: *mpd_connection, uri: *u8) -> bool #foreign libmpdclient;
+send_add :: (_connection: *connection, uri: *u8) -> bool #foreign libmpdclient "mpd_send_add";
 
 /**
 * Shortcut for mpd_send_add() and mpd_response_finish().
@@ -3184,7 +3184,7 @@ mpd_send_add :: (connection: *mpd_connection, uri: *u8) -> bool #foreign libmpdc
 * @param uri URI of a song or directory (added recursively)
 * @return true on success, false on error
 */
-mpd_run_add :: (connection: *mpd_connection, uri: *u8) -> bool #foreign libmpdclient;
+run_add :: (_connection: *connection, uri: *u8) -> bool #foreign libmpdclient "mpd_run_add";
 
 /**
 * Inserts a song into the playlist for a given position: either a single file or a directory.
@@ -3197,7 +3197,7 @@ mpd_run_add :: (connection: *mpd_connection, uri: *u8) -> bool #foreign libmpdcl
 *
 * @since libmpdclient 2.20
 */
-mpd_send_add_whence :: (connection: *mpd_connection, uri: *u8, to: u32, whence: mpd_position_whence) -> bool #foreign libmpdclient;
+send_add_whence :: (_connection: *connection, uri: *u8, to: u32, whence: position_whence) -> bool #foreign libmpdclient "mpd_send_add_whence";
 
 /**
 * Shortcut for mpd_send_add_whence() and mpd_response_finish().
@@ -3210,7 +3210,7 @@ mpd_send_add_whence :: (connection: *mpd_connection, uri: *u8, to: u32, whence: 
 *
 * @since libmpdclient 2.20
 */
-mpd_run_add_whence :: (connection: *mpd_connection, uri: *u8, to: u32, whence: mpd_position_whence) -> bool #foreign libmpdclient;
+run_add_whence :: (_connection: *connection, uri: *u8, to: u32, whence: position_whence) -> bool #foreign libmpdclient "mpd_run_add_whence";
 
 /**
 * Appends a song to the playlist. Call mpd_recv_song_id() for its id.
@@ -3220,7 +3220,7 @@ mpd_run_add_whence :: (connection: *mpd_connection, uri: *u8, to: u32, whence: m
 * @param uri URI of the song to be added
 * @return true on success, false on error
 */
-mpd_send_add_id :: (connection: *mpd_connection, uri: *u8) -> bool #foreign libmpdclient;
+send_add_id :: (_connection: *connection, uri: *u8) -> bool #foreign libmpdclient "mpd_send_add_id";
 
 /**
 * Inserts a song into the playlist for a given position, and returns its id.
@@ -3231,7 +3231,7 @@ mpd_send_add_id :: (connection: *mpd_connection, uri: *u8) -> bool #foreign libm
 * @param to the desired position of the song
 * @return true on success, false on error
 */
-mpd_send_add_id_to :: (connection: *mpd_connection, uri: *u8, to: u32) -> bool #foreign libmpdclient;
+send_add_id_to :: (_connection: *connection, uri: *u8, to: u32) -> bool #foreign libmpdclient "mpd_send_add_id_to";
 
 /**
 * Inserts a song into the playlist for a given position, and returns its id.
@@ -3245,7 +3245,7 @@ mpd_send_add_id_to :: (connection: *mpd_connection, uri: *u8, to: u32) -> bool #
 * 
 * @since libmpdclient 2.20
 */
-mpd_send_add_id_whence :: (connection: *mpd_connection, uri: *u8, to: u32, whence: mpd_position_whence) -> bool #foreign libmpdclient;
+send_add_id_whence :: (_connection: *connection, uri: *u8, to: u32, whence: position_whence) -> bool #foreign libmpdclient "mpd_send_add_id_whence";
 
 /**
 * Returns the id of the new song in the playlist.  To be called after
@@ -3254,7 +3254,7 @@ mpd_send_add_id_whence :: (connection: *mpd_connection, uri: *u8, to: u32, whenc
 * @param connection the connection to MPD
 * @return the new song id, -1 on error or if MPD did not send an id
 */
-mpd_recv_song_id :: (connection: *mpd_connection) -> s32 #foreign libmpdclient;
+recv_song_id :: (_connection: *connection) -> s32 #foreign libmpdclient "mpd_recv_song_id";
 
 /**
 * Executes the "addid" command and reads the response.
@@ -3264,7 +3264,7 @@ mpd_recv_song_id :: (connection: *mpd_connection) -> s32 #foreign libmpdclient;
 * @param uri URI of a song to be added
 * @return the new song id, -1 on error or if MPD did not send an id
 */
-mpd_run_add_id :: (connection: *mpd_connection, uri: *u8) -> s32 #foreign libmpdclient;
+run_add_id :: (_connection: *connection, uri: *u8) -> s32 #foreign libmpdclient "mpd_run_add_id";
 
 /**
 * Executes the "addid" command and reads the response.
@@ -3275,7 +3275,7 @@ mpd_run_add_id :: (connection: *mpd_connection, uri: *u8) -> s32 #foreign libmpd
 * @param to the desired position of the song
 * @return the new song id, -1 on error or if MPD did not send an id
 */
-mpd_run_add_id_to :: (connection: *mpd_connection, uri: *u8, to: u32) -> s32 #foreign libmpdclient;
+run_add_id_to :: (_connection: *connection, uri: *u8, to: u32) -> s32 #foreign libmpdclient "mpd_run_add_id_to";
 
 /**
 * Executes the "addid" command and reads the response.
@@ -3289,7 +3289,7 @@ mpd_run_add_id_to :: (connection: *mpd_connection, uri: *u8, to: u32) -> s32 #fo
 * 
 * @since libmpdclient 2.20
 */
-mpd_run_add_id_whence :: (connection: *mpd_connection, uri: *u8, to: u32, whence: mpd_position_whence) -> s32 #foreign libmpdclient;
+run_add_id_whence :: (_connection: *connection, uri: *u8, to: u32, whence: position_whence) -> s32 #foreign libmpdclient "mpd_run_add_id_whence";
 
 /**
 * Deletes a song from the queue.
@@ -3298,7 +3298,7 @@ mpd_run_add_id_whence :: (connection: *mpd_connection, uri: *u8, to: u32, whence
 * @param pos the position of the song to be deleted
 * @return true on success, false on error
 */
-mpd_send_delete :: (connection: *mpd_connection, pos: u32) -> bool #foreign libmpdclient;
+send_delete :: (_connection: *connection, pos: u32) -> bool #foreign libmpdclient "mpd_send_delete";
 
 /**
 * Shortcut for mpd_send_delete() and mpd_response_finish().
@@ -3307,7 +3307,7 @@ mpd_send_delete :: (connection: *mpd_connection, pos: u32) -> bool #foreign libm
 * @param pos the position of the song to be deleted
 * @return true on success, false on error
 */
-mpd_run_delete :: (connection: *mpd_connection, pos: u32) -> bool #foreign libmpdclient;
+run_delete :: (_connection: *connection, pos: u32) -> bool #foreign libmpdclient "mpd_run_delete";
 
 /**
 * Deletes songs from the queue.
@@ -3320,7 +3320,7 @@ mpd_run_delete :: (connection: *mpd_connection, pos: u32) -> bool #foreign libmp
 *
 * @since libmpdclient 2.8 added support for "UINT_MAX"
 */
-mpd_send_delete_range :: (connection: *mpd_connection, start: u32, end: u32) -> bool #foreign libmpdclient;
+send_delete_range :: (_connection: *connection, start: u32, end: u32) -> bool #foreign libmpdclient "mpd_send_delete_range";
 
 /**
 * Shortcut for mpd_send_delete_range() and mpd_response_finish().
@@ -3333,7 +3333,7 @@ mpd_send_delete_range :: (connection: *mpd_connection, start: u32, end: u32) -> 
 *
 * @since libmpdclient 2.8 added support for "UINT_MAX"
 */
-mpd_run_delete_range :: (connection: *mpd_connection, start: u32, end: u32) -> bool #foreign libmpdclient;
+run_delete_range :: (_connection: *connection, start: u32, end: u32) -> bool #foreign libmpdclient "mpd_run_delete_range";
 
 /**
 * Deletes a song from the queue.
@@ -3342,7 +3342,7 @@ mpd_run_delete_range :: (connection: *mpd_connection, start: u32, end: u32) -> b
 * @param id the id of the song to be deleted
 * @return true on success, false on error
 */
-mpd_send_delete_id :: (connection: *mpd_connection, id: u32) -> bool #foreign libmpdclient;
+send_delete_id :: (_connection: *connection, id: u32) -> bool #foreign libmpdclient "mpd_send_delete_id";
 
 /**
 * Shortcut for mpd_send_delete_id() and mpd_response_finish().
@@ -3351,7 +3351,7 @@ mpd_send_delete_id :: (connection: *mpd_connection, id: u32) -> bool #foreign li
 * @param id the id of the song to be deleted
 * @return true on success, false on error
 */
-mpd_run_delete_id :: (connection: *mpd_connection, id: u32) -> bool #foreign libmpdclient;
+run_delete_id :: (_connection: *connection, id: u32) -> bool #foreign libmpdclient "mpd_run_delete_id";
 
 /**
 * Shuffles the queue.
@@ -3359,7 +3359,7 @@ mpd_run_delete_id :: (connection: *mpd_connection, id: u32) -> bool #foreign lib
 * @param connection the connection to MPD
 * @return true on success, false on error
 */
-mpd_send_shuffle :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_shuffle :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_shuffle";
 
 /**
 * Shortcut for mpd_send_shuffle() and mpd_response_finish().
@@ -3367,7 +3367,7 @@ mpd_send_shuffle :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
 * @param connection the connection to MPD
 * @return true on success, false on error
 */
-mpd_run_shuffle :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+run_shuffle :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_run_shuffle";
 
 /**
 * Shuffles a range within the queue.
@@ -3380,7 +3380,7 @@ mpd_run_shuffle :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
 *
 * @since libmpdclient 2.8 added support for "UINT_MAX"
 */
-mpd_send_shuffle_range :: (connection: *mpd_connection, start: u32, end: u32) -> bool #foreign libmpdclient;
+send_shuffle_range :: (_connection: *connection, start: u32, end: u32) -> bool #foreign libmpdclient "mpd_send_shuffle_range";
 
 /**
 * Shortcut for mpd_send_shuffle_range() and mpd_response_finish().
@@ -3393,7 +3393,7 @@ mpd_send_shuffle_range :: (connection: *mpd_connection, start: u32, end: u32) ->
 *
 * @since libmpdclient 2.8 added support for "UINT_MAX"
 */
-mpd_run_shuffle_range :: (connection: *mpd_connection, start: u32, end: u32) -> bool #foreign libmpdclient;
+run_shuffle_range :: (_connection: *connection, start: u32, end: u32) -> bool #foreign libmpdclient "mpd_run_shuffle_range";
 
 /**
 * Clear the queue.
@@ -3401,7 +3401,7 @@ mpd_run_shuffle_range :: (connection: *mpd_connection, start: u32, end: u32) -> 
 * @param connection the connection to MPD
 * @return true on success, false on error
 */
-mpd_send_clear :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_clear :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_clear";
 
 /**
 * Shortcut for mpd_send_clear() and mpd_response_finish().
@@ -3409,7 +3409,7 @@ mpd_send_clear :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
 * @param connection the connection to MPD
 * @return true on success, false on error
 */
-mpd_run_clear :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+run_clear :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_run_clear";
 
 /**
 * Moves a song within the queue.
@@ -3419,7 +3419,7 @@ mpd_run_clear :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
 * @param to the new position of the song
 * @return true on success, false on error
 */
-mpd_send_move :: (connection: *mpd_connection, from: u32, to: u32) -> bool #foreign libmpdclient;
+send_move :: (_connection: *connection, from: u32, to: u32) -> bool #foreign libmpdclient "mpd_send_move";
 
 /**
 * Shortcut for mpd_send_move() and mpd_response_finish().
@@ -3429,7 +3429,7 @@ mpd_send_move :: (connection: *mpd_connection, from: u32, to: u32) -> bool #fore
 * @param to the new position of the song
 * @return true on success, false on error
 */
-mpd_run_move :: (connection: *mpd_connection, from: u32, to: u32) -> bool #foreign libmpdclient;
+run_move :: (_connection: *connection, from: u32, to: u32) -> bool #foreign libmpdclient "mpd_run_move";
 
 /**
 * Moves a song within the queue.
@@ -3439,7 +3439,7 @@ mpd_run_move :: (connection: *mpd_connection, from: u32, to: u32) -> bool #forei
 * @param to the new position of the song (not an id!)
 * @return true on success, false on error
 */
-mpd_send_move_id :: (connection: *mpd_connection, from: u32, to: u32) -> bool #foreign libmpdclient;
+send_move_id :: (_connection: *connection, from: u32, to: u32) -> bool #foreign libmpdclient "mpd_send_move_id";
 
 /**
 * Shortcut for mpd_send_move_id() and mpd_response_finish().
@@ -3449,7 +3449,7 @@ mpd_send_move_id :: (connection: *mpd_connection, from: u32, to: u32) -> bool #f
 * @param to the new position of the song (not an id!)
 * @return true on success, false on error
 */
-mpd_run_move_id :: (connection: *mpd_connection, from: u32, to: u32) -> bool #foreign libmpdclient;
+run_move_id :: (_connection: *connection, from: u32, to: u32) -> bool #foreign libmpdclient "mpd_run_move_id";
 
 /**
 * Moves a range of songs within the queue.
@@ -3463,7 +3463,7 @@ mpd_run_move_id :: (connection: *mpd_connection, from: u32, to: u32) -> bool #fo
 *
 * @since libmpdclient 2.8 added support for "UINT_MAX"
 */
-mpd_send_move_range :: (connection: *mpd_connection, start: u32, end: u32, to: u32) -> bool #foreign libmpdclient;
+send_move_range :: (_connection: *connection, start: u32, end: u32, to: u32) -> bool #foreign libmpdclient "mpd_send_move_range";
 
 /**
 * Shortcut for mpd_send_move_range() and mpd_response_finish().
@@ -3477,7 +3477,7 @@ mpd_send_move_range :: (connection: *mpd_connection, start: u32, end: u32, to: u
 *
 * @since libmpdclient 2.8 added support for "UINT_MAX"
 */
-mpd_run_move_range :: (connection: *mpd_connection, start: u32, end: u32, to: u32) -> bool #foreign libmpdclient;
+run_move_range :: (_connection: *connection, start: u32, end: u32, to: u32) -> bool #foreign libmpdclient "mpd_run_move_range";
 
 /**
 * Swap the position of two songs in the queue.
@@ -3487,7 +3487,7 @@ mpd_run_move_range :: (connection: *mpd_connection, start: u32, end: u32, to: u3
 * @param pos2 the position of the other song
 * @return true on success, false on error
 */
-mpd_send_swap :: (connection: *mpd_connection, pos1: u32, pos2: u32) -> bool #foreign libmpdclient;
+send_swap :: (_connection: *connection, pos1: u32, pos2: u32) -> bool #foreign libmpdclient "mpd_send_swap";
 
 /**
 * Shortcut for mpd_send_swap() and mpd_response_finish().
@@ -3497,7 +3497,7 @@ mpd_send_swap :: (connection: *mpd_connection, pos1: u32, pos2: u32) -> bool #fo
 * @param pos2 the position of the other song
 * @return true on success, false on error
 */
-mpd_run_swap :: (connection: *mpd_connection, pos1: u32, pos2: u32) -> bool #foreign libmpdclient;
+run_swap :: (_connection: *connection, pos1: u32, pos2: u32) -> bool #foreign libmpdclient "mpd_run_swap";
 
 /**
 * Swap the position of two songs in the queue.
@@ -3507,7 +3507,7 @@ mpd_run_swap :: (connection: *mpd_connection, pos1: u32, pos2: u32) -> bool #for
 * @param id2 the id of the other song
 * @return true on success, false on error
 */
-mpd_send_swap_id :: (connection: *mpd_connection, id1: u32, id2: u32) -> bool #foreign libmpdclient;
+send_swap_id :: (_connection: *connection, id1: u32, id2: u32) -> bool #foreign libmpdclient "mpd_send_swap_id";
 
 /**
 * Shortcut for mpd_send_swap_id() and mpd_response_finish().
@@ -3517,7 +3517,7 @@ mpd_send_swap_id :: (connection: *mpd_connection, id1: u32, id2: u32) -> bool #f
 * @param id2 the id of the other song
 * @return true on success, false on error
 */
-mpd_run_swap_id :: (connection: *mpd_connection, id1: u32, id2: u32) -> bool #foreign libmpdclient;
+run_swap_id :: (_connection: *connection, id1: u32, id2: u32) -> bool #foreign libmpdclient "mpd_run_swap_id";
 
 /**
 * Adds a tag to the specified song (command "addtagid").
@@ -3530,7 +3530,7 @@ mpd_run_swap_id :: (connection: *mpd_connection, id1: u32, id2: u32) -> bool #fo
 *
 * @since libmpdclient 2.12, MPD 0.19
 */
-mpd_send_add_tag_id :: (connection: *mpd_connection, id: u32, tag: mpd_tag_type, value: *u8) -> bool #foreign libmpdclient;
+send_add_tag_id :: (_connection: *connection, id: u32, tag: tag_type, value: *u8) -> bool #foreign libmpdclient "mpd_send_add_tag_id";
 
 /**
 * Shortcut for mpd_send_add_tag_id() and mpd_response_finish().
@@ -3543,7 +3543,7 @@ mpd_send_add_tag_id :: (connection: *mpd_connection, id: u32, tag: mpd_tag_type,
 *
 * @since libmpdclient 2.12, MPD 0.19
 */
-mpd_run_add_tag_id :: (connection: *mpd_connection, id: u32, tag: mpd_tag_type, value: *u8) -> bool #foreign libmpdclient;
+run_add_tag_id :: (_connection: *connection, id: u32, tag: tag_type, value: *u8) -> bool #foreign libmpdclient "mpd_run_add_tag_id";
 
 /**
 * Remove a tag from the specified song (command "cleartagid").
@@ -3555,7 +3555,7 @@ mpd_run_add_tag_id :: (connection: *mpd_connection, id: u32, tag: mpd_tag_type, 
 *
 * @since libmpdclient 2.12, MPD 0.19
 */
-mpd_send_clear_tag_id :: (connection: *mpd_connection, id: u32, tag: mpd_tag_type) -> bool #foreign libmpdclient;
+send_clear_tag_id :: (_connection: *connection, id: u32, tag: tag_type) -> bool #foreign libmpdclient "mpd_send_clear_tag_id";
 
 /**
 * Shortcut for mpd_send_clear_tag_id() and mpd_response_finish().
@@ -3567,7 +3567,7 @@ mpd_send_clear_tag_id :: (connection: *mpd_connection, id: u32, tag: mpd_tag_typ
 *
 * @since libmpdclient 2.12, MPD 0.19
 */
-mpd_run_clear_tag_id :: (connection: *mpd_connection, id: u32, tag: mpd_tag_type) -> bool #foreign libmpdclient;
+run_clear_tag_id :: (_connection: *connection, id: u32, tag: tag_type) -> bool #foreign libmpdclient "mpd_run_clear_tag_id";
 
 /**
 * Remove all tags from the specified song (command "cleartagid").
@@ -3578,7 +3578,7 @@ mpd_run_clear_tag_id :: (connection: *mpd_connection, id: u32, tag: mpd_tag_type
 *
 * @since libmpdclient 2.12, MPD 0.19
 */
-mpd_send_clear_all_tags_id :: (connection: *mpd_connection, id: u32) -> bool #foreign libmpdclient;
+send_clear_all_tags_id :: (_connection: *connection, id: u32) -> bool #foreign libmpdclient "mpd_send_clear_all_tags_id";
 
 /**
 * Shortcut for mpd_send_clear_all_tags_id() and mpd_response_finish().
@@ -3589,7 +3589,7 @@ mpd_send_clear_all_tags_id :: (connection: *mpd_connection, id: u32) -> bool #fo
 *
 * @since libmpdclient 2.12, MPD 0.19
 */
-mpd_run_clear_all_tags_id :: (connection: *mpd_connection, id: u32) -> bool #foreign libmpdclient;
+run_clear_all_tags_id :: (_connection: *connection, id: u32) -> bool #foreign libmpdclient "mpd_run_clear_all_tags_id";
 
 /**
 * Change the priority of the specified song.
@@ -3601,7 +3601,7 @@ mpd_run_clear_all_tags_id :: (connection: *mpd_connection, id: u32) -> bool #for
 *
 * @since libmpdclient 2.6
 */
-mpd_send_prio :: (connection: *mpd_connection, priority: u32, position: u32) -> bool #foreign libmpdclient;
+send_prio :: (_connection: *connection, priority: u32, position: u32) -> bool #foreign libmpdclient "mpd_send_prio";
 
 /**
 * Shortcut for mpd_send_prio() and mpd_response_finish().
@@ -3613,7 +3613,7 @@ mpd_send_prio :: (connection: *mpd_connection, priority: u32, position: u32) -> 
 *
 * @since libmpdclient 2.6
 */
-mpd_run_prio :: (connection: *mpd_connection, priority: u32, position: u32) -> bool #foreign libmpdclient;
+run_prio :: (_connection: *connection, priority: u32, position: u32) -> bool #foreign libmpdclient "mpd_run_prio";
 
 /**
 * Change the priority of a song range.
@@ -3628,7 +3628,7 @@ mpd_run_prio :: (connection: *mpd_connection, priority: u32, position: u32) -> b
 * @since libmpdclient 2.6
 * @since libmpdclient 2.8 added support for "UINT_MAX"
 */
-mpd_send_prio_range :: (connection: *mpd_connection, priority: u32, start: u32, end: u32) -> bool #foreign libmpdclient;
+send_prio_range :: (_connection: *connection, priority: u32, start: u32, end: u32) -> bool #foreign libmpdclient "mpd_send_prio_range";
 
 /**
 * Shortcut for mpd_send_prio_range() and mpd_response_finish().
@@ -3643,7 +3643,7 @@ mpd_send_prio_range :: (connection: *mpd_connection, priority: u32, start: u32, 
 * @since libmpdclient 2.6
 * @since libmpdclient 2.8 added support for "UINT_MAX"
 */
-mpd_run_prio_range :: (connection: *mpd_connection, priority: u32, start: u32, end: u32) -> bool #foreign libmpdclient;
+run_prio_range :: (_connection: *connection, priority: u32, start: u32, end: u32) -> bool #foreign libmpdclient "mpd_run_prio_range";
 
 /**
 * Change the priority of the specified song.
@@ -3655,7 +3655,7 @@ mpd_run_prio_range :: (connection: *mpd_connection, priority: u32, start: u32, e
 *
 * @since libmpdclient 2.6
 */
-mpd_send_prio_id :: (connection: *mpd_connection, priority: u32, id: u32) -> bool #foreign libmpdclient;
+send_prio_id :: (_connection: *connection, priority: u32, id: u32) -> bool #foreign libmpdclient "mpd_send_prio_id";
 
 /**
 * Shortcut for mpd_send_prio_id() and mpd_response_finish().
@@ -3667,7 +3667,7 @@ mpd_send_prio_id :: (connection: *mpd_connection, priority: u32, id: u32) -> boo
 *
 * @since libmpdclient 2.6
 */
-mpd_run_prio_id :: (connection: *mpd_connection, priority: u32, id: u32) -> bool #foreign libmpdclient;
+run_prio_id :: (_connection: *connection, priority: u32, id: u32) -> bool #foreign libmpdclient "mpd_run_prio_id";
 
 /**
 * Specify the portion of a song that shall be played.
@@ -3685,7 +3685,7 @@ mpd_run_prio_id :: (connection: *mpd_connection, priority: u32, id: u32) -> bool
 *
 * @since libmpdclient 2.19, MPD 0.20
 */
-mpd_send_range_id :: (connection: *mpd_connection, id: u32, start: float, end: float) -> bool #foreign libmpdclient;
+send_range_id :: (_connection: *connection, id: u32, start: float, end: float) -> bool #foreign libmpdclient "mpd_send_range_id";
 
 /**
 *
@@ -3700,7 +3700,7 @@ mpd_send_range_id :: (connection: *mpd_connection, id: u32, start: float, end: f
 *
 * @since libmpdclient 2.19, MPD 0.20
 */
-mpd_run_range_id :: (connection: *mpd_connection, id: u32, start: float, end: float) -> bool #foreign libmpdclient;
+run_range_id :: (_connection: *connection, id: u32, start: float, end: float) -> bool #foreign libmpdclient "mpd_run_range_id";
 
 /**
 * Sends the "readpicture" command to MPD.  Call mpd_recv_readpicture() to
@@ -3711,7 +3711,7 @@ mpd_run_range_id :: (connection: *mpd_connection, id: u32, start: float, end: fl
 * @param offset to read from
 * @return true on success
 */
-mpd_send_readpicture :: (connection: *mpd_connection, uri: *u8, offset: u32) -> bool #foreign libmpdclient;
+send_readpicture :: (_connection: *connection, uri: *u8, offset: u32) -> bool #foreign libmpdclient "mpd_send_readpicture";
 
 /**
 * Receives the "readpicture" response
@@ -3722,7 +3722,7 @@ mpd_send_readpicture :: (connection: *mpd_connection, uri: *u8, offset: u32) -> 
 * @param buffer_size the size of the allocated buffer
 * @return read size on success, -1 on failure
 */
-mpd_recv_readpicture :: (connection: *mpd_connection, buffer: *void, buffer_size: size_t) -> s32 #foreign libmpdclient;
+recv_readpicture :: (_connection: *connection, buffer: *void, buffer_size: size_t) -> s32 #foreign libmpdclient "mpd_recv_readpicture";
 
 /**
 * Shortcut for mpd_send_readpicture(), mpd_recv_readpicture() and
@@ -3736,14 +3736,14 @@ mpd_recv_readpicture :: (connection: *mpd_connection, buffer: *void, buffer_size
 * @param buffer_size the size of the allocated buffer
 * @return read size on success, -1 on failure
 */
-mpd_run_readpicture :: (connection: *mpd_connection, uri: *u8, offset: u32, buffer: *void, buffer_size: size_t) -> s32 #foreign libmpdclient;
+run_readpicture :: (_connection: *connection, uri: *u8, offset: u32, buffer: *void, buffer_size: size_t) -> s32 #foreign libmpdclient "mpd_run_readpicture";
 
 /**
 * MPD's replay gain mode.
 *
 * @since libmpdclient 2.19, MPD 0.16.
 */
-mpd_replay_gain_mode :: enum u32 {
+replay_gain_mode :: enum u32 {
     OFF     :: 0;
     TRACK   :: 1;
     ALBUM   :: 2;
@@ -3754,7 +3754,7 @@ mpd_replay_gain_mode :: enum u32 {
 /**
 * Parse a #mpd_pair value to check which replay gain mode it contains.
 */
-mpd_parse_replay_gain_name :: (name: *u8) -> mpd_replay_gain_mode #foreign libmpdclient;
+parse_replay_gain_name :: (name: *u8) -> replay_gain_mode #foreign libmpdclient "mpd_parse_replay_gain_name";
 
 /**
 * Looks up the name of the specified replay gain mode.
@@ -3763,7 +3763,7 @@ mpd_parse_replay_gain_name :: (name: *u8) -> mpd_replay_gain_mode #foreign libmp
 *
 * @since libmpdclient 2.19.
 */
-mpd_lookup_replay_gain_mode :: (mode: mpd_replay_gain_mode) -> *u8 #foreign libmpdclient;
+lookup_replay_gain_mode :: (mode: replay_gain_mode) -> *u8 #foreign libmpdclient "mpd_lookup_replay_gain_mode";
 
 /**
 * Queries the current state of replay gain mode on MPD.
@@ -3777,7 +3777,7 @@ mpd_lookup_replay_gain_mode :: (mode: mpd_replay_gain_mode) -> *u8 #foreign libm
 *
 * @since MPD 0.16, libmpdclient 2.19.
 */
-mpd_send_replay_gain_status :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_replay_gain_status :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_replay_gain_status";
 
 /**
 * Shortcut for mpd_send_replay_gain_status(), mpd_recv_pair_named() and
@@ -3789,7 +3789,7 @@ mpd_send_replay_gain_status :: (connection: *mpd_connection) -> bool #foreign li
 *
 * @since MPD 0.16, libmpdclient 2.19.
 */
-mpd_run_replay_gain_status :: (connection: *mpd_connection) -> mpd_replay_gain_mode #foreign libmpdclient;
+run_replay_gain_status :: (_connection: *connection) -> replay_gain_mode #foreign libmpdclient "mpd_run_replay_gain_status";
 
 /**
 * Sets the current state of replay gain mode on MPD.
@@ -3800,7 +3800,7 @@ mpd_run_replay_gain_status :: (connection: *mpd_connection) -> mpd_replay_gain_m
 *
 * @since MPD 0.16, libmpdclient 2.19.
 */
-mpd_send_replay_gain_mode :: (connection: *mpd_connection, mode: mpd_replay_gain_mode) -> bool #foreign libmpdclient;
+send_replay_gain_mode :: (_connection: *connection, mode: replay_gain_mode) -> bool #foreign libmpdclient "mpd_send_replay_gain_mode";
 
 /**
 * Shortcut for mpd_send_replay_gain_mode() and mpd_response_finish().
@@ -3811,7 +3811,7 @@ mpd_send_replay_gain_mode :: (connection: *mpd_connection, mode: mpd_replay_gain
 *
 * @since MPD 0.16, libmpdclient 2.19.
 */
-mpd_run_replay_gain_mode :: (connection: *mpd_connection, mode: mpd_replay_gain_mode) -> bool #foreign libmpdclient;
+run_replay_gain_mode :: (_connection: *connection, mode: replay_gain_mode) -> bool #foreign libmpdclient "mpd_run_replay_gain_mode";
 
 /**
 * Finishes the response and checks if the command was successful.  If
@@ -3819,7 +3819,7 @@ mpd_run_replay_gain_mode :: (connection: *mpd_connection, mode: mpd_replay_gain_
 *
 * @return true on success, false on error
 */
-mpd_response_finish :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+response_finish :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_response_finish";
 
 /**
 * Finishes the response of the current list command.  If there are
@@ -3827,7 +3827,7 @@ mpd_response_finish :: (connection: *mpd_connection) -> bool #foreign libmpdclie
 *
 * @return true on success, false on error
 */
-mpd_response_next :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+response_next :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_response_next";
 
 /**
 * This type is not yet used, it is reserved for a future protocol
@@ -3848,7 +3848,7 @@ mpd_operator :: enum u32 {
 * @param exact if to match exact
 * @return true on success, false on error
 */
-mpd_search_db_songs :: (connection: *mpd_connection, exact: bool) -> bool #foreign libmpdclient;
+search_db_songs :: (_connection: *connection, exact: bool) -> bool #foreign libmpdclient "mpd_search_db_songs";
 
 /**
 * Search for songs in the database and adds the result to the queue.
@@ -3859,7 +3859,7 @@ mpd_search_db_songs :: (connection: *mpd_connection, exact: bool) -> bool #forei
 * @param exact if to match exact (only "true" supported by MPD 0.16)
 * @return true on success, false on error
 */
-mpd_search_add_db_songs :: (connection: *mpd_connection, exact: bool) -> bool #foreign libmpdclient;
+search_add_db_songs :: (_connection: *connection, exact: bool) -> bool #foreign libmpdclient "mpd_search_add_db_songs";
 
 /**
 * Search for songs in the database and adds the result to a playlist.
@@ -3873,7 +3873,7 @@ mpd_search_add_db_songs :: (connection: *mpd_connection, exact: bool) -> bool #f
 *
 * @since libmpdclient 2.17.
 */
-mpd_search_add_db_songs_to_playlist :: (connection: *mpd_connection, playlist_name: *u8) -> bool #foreign libmpdclient;
+search_add_db_songs_to_playlist :: (_connection: *connection, playlist_name: *u8) -> bool #foreign libmpdclient "mpd_search_add_db_songs_to_playlist";
 
 /**
 * Search for songs in the queue.
@@ -3885,7 +3885,7 @@ mpd_search_add_db_songs_to_playlist :: (connection: *mpd_connection, playlist_na
 * @param exact if to match exact
 * @return true on success, false on error
 */
-mpd_search_queue_songs :: (connection: *mpd_connection, exact: bool) -> bool #foreign libmpdclient;
+search_queue_songs :: (_connection: *connection, exact: bool) -> bool #foreign libmpdclient "mpd_search_queue_songs";
 
 /**
 * Obtains a list of unique tag values from the database.
@@ -3897,7 +3897,7 @@ mpd_search_queue_songs :: (connection: *mpd_connection, exact: bool) -> bool #fo
 * @param type The type of the tags to search for
 * @return true on success, false on error
 */
-mpd_search_db_tags :: (connection: *mpd_connection, type: mpd_tag_type) -> bool #foreign libmpdclient;
+search_db_tags :: (_connection: *connection, type: tag_type) -> bool #foreign libmpdclient "mpd_search_db_tags";
 
 /**
 * Gathers statistics on a set of songs in the database.
@@ -3908,7 +3908,7 @@ mpd_search_db_tags :: (connection: *mpd_connection, type: mpd_tag_type) -> bool 
 * @param connection the connection to MPD
 * @return true on success, false on error
 */
-mpd_count_db_songs :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+count_db_songs :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_count_db_songs";
 
 /**
 * Limit the search to a certain directory.
@@ -3920,7 +3920,7 @@ mpd_count_db_songs :: (connection: *mpd_connection) -> bool #foreign libmpdclien
 *
 * @since libmpdclient 2.9
 */
-mpd_search_add_base_constraint :: (connection: *mpd_connection, oper: mpd_operator, value: *u8) -> bool #foreign libmpdclient;
+search_add_base_constraint :: (_connection: *connection, oper: mpd_operator, value: *u8) -> bool #foreign libmpdclient "mpd_search_add_base_constraint";
 
 /**
 * Add a constraint on the song's URI.
@@ -3930,7 +3930,7 @@ mpd_search_add_base_constraint :: (connection: *mpd_connection, oper: mpd_operat
 * @param value The value of the constraint
 * @return true on success, false on error
 */
-mpd_search_add_uri_constraint :: (connection: *mpd_connection, oper: mpd_operator, value: *u8) -> bool #foreign libmpdclient;
+search_add_uri_constraint :: (_connection: *connection, oper: mpd_operator, value: *u8) -> bool #foreign libmpdclient "mpd_search_add_uri_constraint";
 
 /**
 * Add a constraint to a search limiting the value of a tag.
@@ -3941,7 +3941,7 @@ mpd_search_add_uri_constraint :: (connection: *mpd_connection, oper: mpd_operato
 * @param value The value of the constraint
 * @return true on success, false on error
 */
-mpd_search_add_tag_constraint :: (connection: *mpd_connection, oper: mpd_operator, type: mpd_tag_type, value: *u8) -> bool #foreign libmpdclient;
+search_add_tag_constraint :: (_connection: *connection, oper: mpd_operator, type: tag_type, value: *u8) -> bool #foreign libmpdclient "mpd_search_add_tag_constraint";
 
 /**
 * Add a constraint to a search, search for a value in any tag.
@@ -3951,7 +3951,7 @@ mpd_search_add_tag_constraint :: (connection: *mpd_connection, oper: mpd_operato
 * @param value The value of the constraint
 * @return true on success, false on error
 */
-mpd_search_add_any_tag_constraint :: (connection: *mpd_connection, oper: mpd_operator, value: *u8) -> bool #foreign libmpdclient;
+search_add_any_tag_constraint :: (_connection: *connection, oper: mpd_operator, value: *u8) -> bool #foreign libmpdclient "mpd_search_add_any_tag_constraint";
 
 /**
 * Limit the search to files modified after the given time stamp.
@@ -3963,7 +3963,7 @@ mpd_search_add_any_tag_constraint :: (connection: *mpd_connection, oper: mpd_ope
 *
 * @since libmpdclient 2.10
 */
-mpd_search_add_modified_since_constraint :: (connection: *mpd_connection, oper: mpd_operator, value: time_t) -> bool #foreign libmpdclient;
+search_add_modified_since_constraint :: (_connection: *connection, oper: mpd_operator, value: time_t) -> bool #foreign libmpdclient "mpd_search_add_modified_since_constraint";
 
 /**
 * Add an expression string.
@@ -3975,7 +3975,7 @@ mpd_search_add_modified_since_constraint :: (connection: *mpd_connection, oper: 
 *
 * @since libmpdclient 2.15, MPD 0.21
 */
-mpd_search_add_expression :: (connection: *mpd_connection, expression: *u8) -> bool #foreign libmpdclient;
+search_add_expression :: (_connection: *connection, expression: *u8) -> bool #foreign libmpdclient "mpd_search_add_expression";
 
 /**
 * Group the results by the specified tag.
@@ -3986,7 +3986,7 @@ mpd_search_add_expression :: (connection: *mpd_connection, expression: *u8) -> b
 *
 * @since libmpdclient 2.12, MPD 0.19
 */
-mpd_search_add_group_tag :: (connection: *mpd_connection, type: mpd_tag_type) -> bool #foreign libmpdclient;
+search_add_group_tag :: (_connection: *connection, type: tag_type) -> bool #foreign libmpdclient "mpd_search_add_group_tag";
 
 /**
 * Sort the results by the specified named attribute.
@@ -3999,7 +3999,7 @@ mpd_search_add_group_tag :: (connection: *mpd_connection, type: mpd_tag_type) ->
 *
 * @since MPD 0.21, libmpdclient 2.15
 */
-mpd_search_add_sort_name :: (connection: *mpd_connection, name: *u8, descending: bool) -> bool #foreign libmpdclient;
+search_add_sort_name :: (_connection: *connection, name: *u8, descending: bool) -> bool #foreign libmpdclient "mpd_search_add_sort_name";
 
 /**
 * Sort the results by the specified tag.
@@ -4012,7 +4012,7 @@ mpd_search_add_sort_name :: (connection: *mpd_connection, name: *u8, descending:
 * @since MPD 0.21, libmpdclient 2.11; #descending since libmpdclient
 * 2.15
 */
-mpd_search_add_sort_tag :: (connection: *mpd_connection, type: mpd_tag_type, descending: bool) -> bool #foreign libmpdclient;
+search_add_sort_tag :: (_connection: *connection, type: tag_type, descending: bool) -> bool #foreign libmpdclient "mpd_search_add_sort_tag";
 
 /**
 * Request only a portion of the result set.
@@ -4024,7 +4024,7 @@ mpd_search_add_sort_tag :: (connection: *mpd_connection, type: mpd_tag_type, des
 *
 * @since libmpdclient 2.10
 */
-mpd_search_add_window :: (connection: *mpd_connection, start: u32, end: u32) -> bool #foreign libmpdclient;
+search_add_window :: (_connection: *connection, start: u32, end: u32) -> bool #foreign libmpdclient "mpd_search_add_window";
 
 /**
 * Adds the search to the specified position in the queue.
@@ -4035,7 +4035,7 @@ mpd_search_add_window :: (connection: *mpd_connection, start: u32, end: u32) -> 
 * 
 * @since libmpdclient 2.20
 */
-mpd_search_add_position :: (connection: *mpd_connection, position: u32, whence: mpd_position_whence) -> bool #foreign libmpdclient;
+search_add_position :: (_connection: *connection, position: u32, whence: position_whence) -> bool #foreign libmpdclient "mpd_search_add_position";
 
 /**
 * Starts the real search with constraints added with
@@ -4044,7 +4044,7 @@ mpd_search_add_position :: (connection: *mpd_connection, position: u32, whence: 
 * @param connection the connection to MPD
 * @return true on success, false on error
 */
-mpd_search_commit :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+search_commit :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_search_commit";
 
 /**
 * Cancels the search request before you have called
@@ -4053,7 +4053,7 @@ mpd_search_commit :: (connection: *mpd_connection) -> bool #foreign libmpdclient
 *
 * @param connection the connection to MPD
 */
-mpd_search_cancel :: (connection: *mpd_connection) -> void #foreign libmpdclient;
+search_cancel :: (_connection: *connection) -> void #foreign libmpdclient "mpd_search_cancel";
 
 /**
 * Same as mpd_recv_pair_named(), but the pair name is specified as
@@ -4064,7 +4064,7 @@ mpd_search_cancel :: (connection: *mpd_connection) -> void #foreign libmpdclient
 * @return a pair, or NULL on error or if there are no more matching
 * pairs in this response
 */
-mpd_recv_pair_tag :: (connection: *mpd_connection, type: mpd_tag_type) -> *mpd_pair #foreign libmpdclient;
+recv_pair_tag :: (_connection: *connection, type: tag_type) -> *pair #foreign libmpdclient "mpd_recv_pair_tag";
 
 /**
 * Sends a command with arguments to the MPD server.  The argument
@@ -4074,14 +4074,14 @@ mpd_recv_pair_tag :: (connection: *mpd_connection, type: mpd_tag_type) -> *mpd_p
 * @param command the command to be sent
 * @return true on success
 */
-mpd_send_command_CFormat :: (connection: *mpd_connection, command: *u8, __args: ..Any) -> bool #foreign libmpdclient;
-mpd_send_command :: (connection: *mpd_connection, command: string, __args: ..Any) -> bool {
+send_command_CFormat :: (_connection: *connection, command: *u8, __args: ..Any) -> bool #foreign libmpdclient "mpd_send_command";
+send_command :: (_connection: *connection, command: string, __args: ..Any) -> bool {
     push_allocator(temp);
     formatted_text_builder: String_Builder;
     print_to_builder(*formatted_text_builder, command, ..__args);
     append(*formatted_text_builder, "\0");
     formatted_text := builder_to_string(*formatted_text_builder);
-    return mpd_send_command_CFormat(connection, "%s", formatted_text.data);
+    return send_command_CFormat(_connection, "%s", formatted_text.data);
 } @PrintLike
 
 /**
@@ -4105,42 +4105,42 @@ mpd_send_command :: (connection: *mpd_connection, command: string, __args: ..Any
 *
 * @since libmpdclient 2.4
 */
-mpd_settings_new :: (host: *u8, port: u32, timeout_ms: u32, reserved: *u8, password: *u8) -> *mpd_settings #foreign libmpdclient;
+settings_new :: (host: *u8, port: u32, timeout_ms: u32, reserved: *u8, password: *u8) -> *settings #foreign libmpdclient "mpd_settings_new";
 
 /**
 * Releases a #mpd_settings object.
 *
 * @since libmpdclient 2.4
 */
-mpd_settings_free :: (settings: *mpd_settings) -> void #foreign libmpdclient;
+settings_free :: (_settings: *settings) -> void #foreign libmpdclient "mpd_settings_free";
 
 /**
 * Returns the host name (without password/port), or NULL if unknown.
 *
 * @since libmpdclient 2.4
 */
-mpd_settings_get_host :: (settings: *mpd_settings) -> *u8 #foreign libmpdclient;
+settings_get_host :: (_settings: *settings) -> *u8 #foreign libmpdclient "mpd_settings_get_host";
 
 /**
 * Returns the port number, or 0 if not applicable.
 *
 * @since libmpdclient 2.4
 */
-mpd_settings_get_port :: (settings: *mpd_settings) -> u32 #foreign libmpdclient;
+settings_get_port :: (_settings: *settings) -> u32 #foreign libmpdclient "mpd_settings_get_port";
 
 /**
 * Returns the timeout in milliseconds, or 0 if unknown.
 *
 * @since libmpdclient 2.4
 */
-mpd_settings_get_timeout_ms :: (settings: *mpd_settings) -> u32 #foreign libmpdclient;
+settings_get_timeout_ms :: (_settings: *settings) -> u32 #foreign libmpdclient "mpd_settings_get_timeout_ms";
 
 /**
 * Returns the password, or NULL if none was configured.
 *
 * @since libmpdclient 2.4
 */
-mpd_settings_get_password :: (settings: *mpd_settings) -> *u8 #foreign libmpdclient;
+settings_get_password :: (_settings: *settings) -> *u8 #foreign libmpdclient "mpd_settings_get_password";
 
 /**
 * \struct mpd_stats
@@ -4148,14 +4148,14 @@ mpd_settings_get_password :: (settings: *mpd_settings) -> *u8 #foreign libmpdcli
 * An opaque object representing MPD's response to the "stats"
 * command.  To release this object, call mpd_stats_free().
 */
-mpd_stats :: struct {}
+stats :: struct {}
 
 /**
 * Send the "stats" command to MPD. Call mpd_recv_stats() to read the response.
 *
 * @return true on success
 */
-mpd_send_stats :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
+send_stats :: (_connection: *connection) -> bool #foreign libmpdclient "mpd_send_stats";
 
 /**
 * Begins parsing server stats: creates a new empty #mpd_stats object.
@@ -4164,71 +4164,71 @@ mpd_send_stats :: (connection: *mpd_connection) -> bool #foreign libmpdclient;
 * @return the newly allocated #mpd_stats object, or NULL if out of
 * memory
 */
-mpd_stats_begin :: () -> *mpd_stats #foreign libmpdclient;
+stats_begin :: () -> *stats #foreign libmpdclient "mpd_stats_begin";
 
 /**
 * Parses the pair, adding its information to the specified #mpd_stats
 * object.
 */
-mpd_stats_feed :: (stats: *mpd_stats, pair: *mpd_pair) -> void #foreign libmpdclient;
+stats_feed :: (_stats: *stats, _pair: *pair) -> void #foreign libmpdclient "mpd_stats_feed";
 
 /**
 * Reads the "stats" response from MPD.
 *
 * @return a #mpd_stats object, or NULL on error
 */
-mpd_recv_stats :: (connection: *mpd_connection) -> *mpd_stats #foreign libmpdclient;
+recv_stats :: (_connection: *connection) -> *stats #foreign libmpdclient "mpd_recv_stats";
 
 /**
 * Shortcut for mpd_send_stats() and mpd_recv_stats().
 */
-mpd_run_stats :: (connection: *mpd_connection) -> *mpd_stats #foreign libmpdclient;
+run_stats :: (_connection: *connection) -> *stats #foreign libmpdclient "mpd_run_stats";
 
 /**
 * Frees a #mpd_stats object.
 */
-mpd_stats_free :: (stats: *mpd_stats) -> void #foreign libmpdclient;
+stats_free :: (_stats: *stats) -> void #foreign libmpdclient "mpd_stats_free";
 
 /**
 * @return the number of distinct artists in MPD's database, or 0 if
 * unknown
 */
-mpd_stats_get_number_of_artists :: (stats: *mpd_stats) -> u32 #foreign libmpdclient;
+stats_get_number_of_artists :: (_stats: *stats) -> u32 #foreign libmpdclient "mpd_stats_get_number_of_artists";
 
 /**
 * @return the number of distinct album names in MPD's database, or 0
 * if unknown
 */
-mpd_stats_get_number_of_albums :: (stats: *mpd_stats) -> u32 #foreign libmpdclient;
+stats_get_number_of_albums :: (_stats: *stats) -> u32 #foreign libmpdclient "mpd_stats_get_number_of_albums";
 
 /**
 * @return the total number of song files in MPD's database, or 0 if
 * unknown
 */
-mpd_stats_get_number_of_songs :: (stats: *mpd_stats) -> u32 #foreign libmpdclient;
+stats_get_number_of_songs :: (_stats: *stats) -> u32 #foreign libmpdclient "mpd_stats_get_number_of_songs";
 
 /**
 * @return the uptime of MPD in seconds, or 0 if unknown
 */
-mpd_stats_get_uptime :: (stats: *mpd_stats) -> u64 #foreign libmpdclient;
+stats_get_uptime :: (_stats: *stats) -> u64 #foreign libmpdclient "mpd_stats_get_uptime";
 
 /**
 * @return the UNIX time stamp of the last database update, or 0 if
 * unknown
 */
-mpd_stats_get_db_update_time :: (stats: *mpd_stats) -> u64 #foreign libmpdclient;
+stats_get_db_update_time :: (_stats: *stats) -> u64 #foreign libmpdclient "mpd_stats_get_db_update_time";
 
 /**
 * @return the accumulated time MPD was playing music since the
 * process was started, or 0 if unknown
 */
-mpd_stats_get_play_time :: (stats: *mpd_stats) -> u64 #foreign libmpdclient;
+stats_get_play_time :: (_stats: *stats) -> u64 #foreign libmpdclient "mpd_stats_get_play_time";
 
 /**
 * @return the accumulated duration of all songs in the database, or 0
 * if unknown
 */
-mpd_stats_get_db_play_time :: (stats: *mpd_stats) -> u64 #foreign libmpdclient;
+stats_get_db_play_time :: (_stats: *stats) -> u64 #foreign libmpdclient "mpd_stats_get_db_play_time";
 
 /**
 * Adds or replaces a sticker value.
@@ -4242,7 +4242,7 @@ mpd_stats_get_db_play_time :: (stats: *mpd_stats) -> u64 #foreign libmpdclient;
 *
 * @since libmpdclient 2.1
 */
-mpd_send_sticker_set :: (connection: *mpd_connection, type: *u8, uri: *u8, name: *u8, value: *u8) -> bool #foreign libmpdclient;
+send_sticker_set :: (_connection: *connection, type: *u8, uri: *u8, name: *u8, value: *u8) -> bool #foreign libmpdclient "mpd_send_sticker_set";
 
 /**
 * Shortcut for mpd_send_sticker_set() and mpd_response_finish().
@@ -4256,7 +4256,7 @@ mpd_send_sticker_set :: (connection: *mpd_connection, type: *u8, uri: *u8, name:
 *
 * @since libmpdclient 2.1
 */
-mpd_run_sticker_set :: (connection: *mpd_connection, type: *u8, uri: *u8, name: *u8, value: *u8) -> bool #foreign libmpdclient;
+run_sticker_set :: (_connection: *connection, type: *u8, uri: *u8, name: *u8, value: *u8) -> bool #foreign libmpdclient "mpd_run_sticker_set";
 
 /**
 * Deletes a sticker value.
@@ -4269,7 +4269,7 @@ mpd_run_sticker_set :: (connection: *mpd_connection, type: *u8, uri: *u8, name: 
 *
 * @since libmpdclient 2.1
 */
-mpd_send_sticker_delete :: (connection: *mpd_connection, type: *u8, uri: *u8, name: *u8) -> bool #foreign libmpdclient;
+send_sticker_delete :: (_connection: *connection, type: *u8, uri: *u8, name: *u8) -> bool #foreign libmpdclient "mpd_send_sticker_delete";
 
 /**
 * Shortcut for mpd_send_sticker_delete() and mpd_response_finish().
@@ -4282,7 +4282,7 @@ mpd_send_sticker_delete :: (connection: *mpd_connection, type: *u8, uri: *u8, na
 *
 * @since libmpdclient 2.1
 */
-mpd_run_sticker_delete :: (connection: *mpd_connection, type: *u8, uri: *u8, name: *u8) -> bool #foreign libmpdclient;
+run_sticker_delete :: (_connection: *connection, type: *u8, uri: *u8, name: *u8) -> bool #foreign libmpdclient "mpd_run_sticker_delete";
 
 /**
 * Queries a sticker value.  Call mpd_recv_sticker() to receive the response.
@@ -4295,7 +4295,7 @@ mpd_run_sticker_delete :: (connection: *mpd_connection, type: *u8, uri: *u8, nam
 *
 * @since libmpdclient 2.1
 */
-mpd_send_sticker_get :: (connection: *mpd_connection, type: *u8, uri: *u8, name: *u8) -> bool #foreign libmpdclient;
+send_sticker_get :: (_connection: *connection, type: *u8, uri: *u8, name: *u8) -> bool #foreign libmpdclient "mpd_send_sticker_get";
 
 /**
 * Obtains a list of all stickers of the specified object.  Call
@@ -4308,7 +4308,7 @@ mpd_send_sticker_get :: (connection: *mpd_connection, type: *u8, uri: *u8, name:
 *
 * @since libmpdclient 2.1
 */
-mpd_send_sticker_list :: (connection: *mpd_connection, type: *u8, uri: *u8) -> bool #foreign libmpdclient;
+send_sticker_list :: (_connection: *connection, type: *u8, uri: *u8) -> bool #foreign libmpdclient "mpd_send_sticker_list";
 
 /**
 * Searches for stickers with the specified name. Call mpd_recv_sticker() to
@@ -4323,7 +4323,7 @@ mpd_send_sticker_list :: (connection: *mpd_connection, type: *u8, uri: *u8) -> b
 *
 * @since libmpdclient 2.1
 */
-mpd_send_sticker_find :: (connection: *mpd_connection, type: *u8, base_uri: *u8, name: *u8) -> bool #foreign libmpdclient;
+send_sticker_find :: (_connection: *connection, type: *u8, base_uri: *u8, name: *u8) -> bool #foreign libmpdclient "mpd_send_sticker_find";
 
 /**
 * Parse a sticker input line in the form "name=value".
@@ -4336,7 +4336,7 @@ mpd_send_sticker_find :: (connection: *mpd_connection, type: *u8, base_uri: *u8,
 *
 * @since libmpdclient 2.1
 */
-mpd_parse_sticker :: (input: *u8, name_length_r: *size_t) -> *u8 #foreign libmpdclient;
+parse_sticker :: (input: *u8, name_length_r: *size_t) -> *u8 #foreign libmpdclient "mpd_parse_sticker";
 
 /**
 * Receives the next sticker.  You have to free the return value with
@@ -4348,14 +4348,14 @@ mpd_parse_sticker :: (input: *u8, name_length_r: *size_t) -> *u8 #foreign libmpd
 *
 * @since libmpdclient 2.1
 */
-mpd_recv_sticker :: (connection: *mpd_connection) -> *mpd_pair #foreign libmpdclient;
+recv_sticker :: (_connection: *connection) -> *pair #foreign libmpdclient "mpd_recv_sticker";
 
 /**
 * Free the pair returned by mpd_recv_sticker().
 *
 * @since libmpdclient 2.1
 */
-mpd_return_sticker :: (connection: *mpd_connection, pair: *mpd_pair) -> void #foreign libmpdclient;
+return_sticker :: (_connection: *connection, _pair: *pair) -> void #foreign libmpdclient "mpd_return_sticker";
 
 #scope_file
 
