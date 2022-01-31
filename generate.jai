@@ -16,7 +16,7 @@ MPD_PATH :: "libmpdclient";
 // }
 
 generate_bindings :: (write_file := true) {
-    output_filename := "generated_mpd.jai";
+    output_filename := "module.jai";
     opts: Generate_Bindings_Options;
     {
         using opts;
@@ -74,7 +74,7 @@ generate_bindings :: (write_file := true) {
 modified_declaration_names: [..] string;
 
 mpd_first_visitor :: (decl: *Declaration, parent_decl: *Declaration) -> Declaration_Visit_Result {
-    // strip mpd_ prefix from functions/types/enums
+    // strip mpd_ prefix from functions/structs/enums
     if decl.kind == {
         case .ENUM;     #through;
         case .STRUCT;   #through;

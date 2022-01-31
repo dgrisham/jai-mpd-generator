@@ -4362,5 +4362,5 @@ return_sticker :: (_connection: *connection, _pair: *pair) -> void #foreign libm
 
 #if OS == .LINUX {
     #import "POSIX";
-    libmpdclient :: #foreign_library "linux/libmpdclient";
+    libmpdclient :: #foreign_library "bin/libmpdclient";
 }
