@@ -73,16 +73,26 @@ generate_bindings :: (write_file := true) {
 
 modified_declaration_names: [..] string;
 
+enums_to_make_enum_flags :: string.["mpd_idle", "mpd_async_event"];
+
 mpd_first_visitor :: (decl: *Declaration, parent_decl: *Declaration) -> Declaration_Visit_Result {
     // strip mpd_ prefix from functions/structs/enums
     if decl.kind == {
-        case .ENUM;     #through;
-        case .STRUCT;   #through;
-        case .FUNCTION;
-            if starts_with(decl.name, "mpd_") && decl.name != "mpd_operator" {
-                decl.output_name = advance(decl.name, 4);
-                array_add(*modified_declaration_names, decl.output_name);
+      case .ENUM;
+        for enums_to_make_enum_flags {
+            if decl.name == it {
+              en := cast(*Enum)decl;
+              en.flags |= .IS_ENUM_FLAGS;
+              en.flags |= .VALUES_IN_HEX;
             }
+        }
+        #through;
+      case .STRUCT; #through;
+      case .FUNCTION;
+        if starts_with(decl.name, "mpd_") && decl.name != "mpd_operator" {
+              decl.output_name = advance(decl.name, 4);
+              array_add(*modified_declaration_names, decl.output_name);
+        }
     }
     return .RECURSE;
 }
@@ -101,6 +111,6 @@ CLANG_SUFFIX :: #string END
 
 #if OS == .LINUX {
     #import "POSIX";
-    libmpdclient :: #foreign_library "linux/libmpdclient";
+    libmpdclient :: #foreign_library "bin/libmpdclient";
 }
 END

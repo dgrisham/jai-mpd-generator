@@ -1066,22 +1066,22 @@ run_getfingerprint_chromaprint :: (_connection: *connection, uri: *u8, buffer: *
 * @since libmpdclient 2.19 added support for #MPD_IDLE_NEIGHBOR,
 * #MPD_IDLE_MOUNT
 */
-idle :: enum u32 {
-    DATABASE        :: 1;
-    STORED_PLAYLIST :: 2;
-    QUEUE           :: 4;
-    PLAYLIST        :: 4;
-    PLAYER          :: 8;
-    MIXER           :: 16;
-    OUTPUT          :: 32;
-    OPTIONS         :: 64;
-    UPDATE          :: 128;
-    STICKER         :: 256;
-    SUBSCRIPTION    :: 512;
-    MESSAGE         :: 1024;
-    PARTITION       :: 2048;
-    NEIGHBOR        :: 4096;
-    MOUNT           :: 8192;
+idle :: enum_flags u32 {
+    DATABASE        :: 0x1;
+    STORED_PLAYLIST :: 0x2;
+    QUEUE           :: 0x4;
+    PLAYLIST        :: 0x4;
+    PLAYER          :: 0x8;
+    MIXER           :: 0x10;
+    OUTPUT          :: 0x20;
+    OPTIONS         :: 0x40;
+    UPDATE          :: 0x80;
+    STICKER         :: 0x100;
+    SUBSCRIPTION    :: 0x200;
+    MESSAGE         :: 0x400;
+    PARTITION       :: 0x800;
+    NEIGHBOR        :: 0x1000;
+    MOUNT           :: 0x2000;
 }
 
 /**
