@@ -4,7 +4,8 @@ MPD_PATH :: "libmpdclient";
     set_build_options_dc(.{do_output=false});
 
     write_file := true;
-    user_args := compiler_get_command_line_arguments();
+    
+    user_args := get_build_options().compile_time_command_line;
     for user_args {
         if it == "-no_write" write_file = false;
     }
@@ -30,31 +31,30 @@ generate_bindings :: (write_file := true) {
 
         array_add(*extra_clang_arguments, "-x", "c");
         mimic_spacing_flags = Mimic_Spacing_Flags.GLOBAL;
-        generate_foreign_library_declarations = false;
+        generate_library_declarations = false;
         alias_original_enum_names = false;
         generate_compile_time_struct_checks = false;
 
         will_print_bindings = () {
             // we'll also walk all the declarations recursively, making some
             // changes. see mpd_*_visitor below.
-            for context.compiler.global_scope.members {
+            for context.generator.global_scope.members {
                 visit_declarations(mpd_first_visitor, it);
             }
-            for context.compiler.global_scope.members {
+            for context.generator.global_scope.members {
                 visit_declarations(mpd_second_visitor, it);
             }
         };
     }
     reset_temporary_storage();
 
-    bindings_builder, success := generate_bindings(opts);
+    bindings_builder, success := generate_bindings(opts, log_results=true);
     if !success return;
     defer free_buffers(*bindings_builder);
-    show_generator_results();
 
     if write_file {
         append(*bindings_builder, CLANG_SUFFIX);
-        success = write_entire_file(output_filename, bindings_builder);
+        success = write_entire_file(output_filename, *bindings_builder);
         if !success {
             log_error("Could not write generated output to \"%\"\n", output_filename);
             return;
@@ -111,6 +111,6 @@ CLANG_SUFFIX :: #string END
 
 #if OS == .LINUX {
     #import "POSIX";
-    libmpdclient :: #foreign_library "bin/libmpdclient";
+    libmpdclient :: #library "bin/libmpdclient";
 }
 END

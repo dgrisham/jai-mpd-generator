@@ -1571,7 +1571,7 @@ neighbor_begin :: (_pair: *pair) -> *neighbor #foreign libmpdclient "mpd_neighbo
 neighbor_feed :: (_neighbor: *neighbor, _pair: *pair) -> bool #foreign libmpdclient "mpd_neighbor_feed";
 
 /**
-* Frees a #mpd_neighbor object returned from mpd_recv_neighbor() or 
+* Frees a #mpd_neighbor object returned from mpd_recv_neighbor() or
 * mpd_neighbor_begin().
 *
 * @since libmpdclient 2.17
@@ -2797,7 +2797,7 @@ send_playlist_add :: (_connection: *connection, name: *u8, path: *u8) -> bool #f
 run_playlist_add :: (_connection: *connection, name: *u8, path: *u8) -> bool #foreign libmpdclient "mpd_run_playlist_add";
 
 /**
-* Inserts a uri to a playlist for a given position. The playlist 
+* Inserts a uri to a playlist for a given position. The playlist
 * will be created if it does not exist.
 *
 * @param connection the connection to MPD
@@ -2963,7 +2963,7 @@ send_load_range :: (_connection: *connection, name: *u8, start: u32, end: u32) -
 run_load_range :: (_connection: *connection, name: *u8, start: u32, end: u32) -> bool #foreign libmpdclient "mpd_run_load_range";
 
 /**
-* Like mpd_send_load() or mpd_send_load_range(), but with range 
+* Like mpd_send_load() or mpd_send_load_range(), but with range
 * and to parameters.
 *
 * @param connection the connection to MPD
@@ -3242,7 +3242,7 @@ send_add_id_to :: (_connection: *connection, uri: *u8, to: u32) -> bool #foreign
 * @param to the desired position of the song
 * @param whence how to interpret the position parameter
 * @return true on success, false on error
-* 
+*
 * @since libmpdclient 2.20
 */
 send_add_id_whence :: (_connection: *connection, uri: *u8, to: u32, whence: position_whence) -> bool #foreign libmpdclient "mpd_send_add_id_whence";
@@ -3286,7 +3286,7 @@ run_add_id_to :: (_connection: *connection, uri: *u8, to: u32) -> s32 #foreign l
 * @param to the desired position of the song
 * @param whence how to interpret the position parameter
 * @return the new song id, -1 on error or if MPD did not send an id
-* 
+*
 * @since libmpdclient 2.20
 */
 run_add_id_whence :: (_connection: *connection, uri: *u8, to: u32, whence: position_whence) -> s32 #foreign libmpdclient "mpd_run_add_id_whence";
@@ -4032,7 +4032,7 @@ search_add_window :: (_connection: *connection, start: u32, end: u32) -> bool #f
 * @param connection a #mpd_connection
 * @param position the position in the queue
 * @param whence how to interpret the position parameter
-* 
+*
 * @since libmpdclient 2.20
 */
 search_add_position :: (_connection: *connection, position: u32, whence: position_whence) -> bool #foreign libmpdclient "mpd_search_add_position";
@@ -4362,5 +4362,5 @@ return_sticker :: (_connection: *connection, _pair: *pair) -> void #foreign libm
 
 #if OS == .LINUX {
     #import "POSIX";
-    libmpdclient :: #foreign_library "bin/libmpdclient";
+    libmpdclient :: #library "bin/libmpdclient";
 }
